@@ -14,9 +14,8 @@ export default class UI {
    * @param {config} config - user config for Tool
    * @param {object} api - Editor.js API
    */
-  constructor({ data, config, api, changeView }) {
+  constructor({ data, config, api }) {
     this.api = api;
-    this.changeView = changeView;
 
     /**
      * Tool's initial config
@@ -29,14 +28,7 @@ export default class UI {
       // root element
       wrapper: null,
       container: null,
-      progress: null,
-      input: null,
-      inputHolder: null,
-      linkContent: null,
-      linkImage: null,
-      linkTitle: null,
-      linkDescription: null,
-      linkText: null
+      defaultTable: null
     };
 
     this._data = {
@@ -59,309 +51,83 @@ export default class UI {
       /**
        * Tool's classes
        */
-      container: 'link-tool',
-      inputEl: 'link-tool__input',
-      inputHolder: 'link-tool__input-holder',
-      inputError: 'link-tool__input-holder--error',
-      linkContent: 'link-tool__content',
-      linkContentRendered: 'link-tool__content--rendered',
-      linkImage: 'link-tool__image',
-      linkTitle: 'link-tool__title',
-      linkDescription: 'link-tool__description',
-      linkText: 'link-tool__anchor',
-      progress: 'link-tool__progress',
-      progressLoading: 'link-tool__progress--loading',
-      progressLoaded: 'link-tool__progress--loaded',
-
-      // buttons
-      settingsWrapper: 'cdx-custom-settings',
-      settingsButton: this.api.styles.settingsButton,
-      settingsButtonActive: this.api.styles.settingsButtonActive
+      container: 'cdx-table-wrapper',
+      table: 'cdx-table',
+      cell: 'cdx-table__cell'
     };
   }
 
   /**
-   * just for debug
-   *
+   * draw render View
    */
-  async getFakeData() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        return resolve({
-          success: true,
-          meta: {
-            title: 'CodeX Team',
-            // eslint-disable-next-line
-            site_name: "CodeX",
-            description:
-              'Club of web-development, design and marketing. We build team learning how to build full-valued projects on the world market.',
-            image: {
-              url: 'https://codex.so/public/app/img/meta_img.png'
-            }
-          }
-        });
-      }, 1000);
-    });
-  }
-
-  /**
-   * Sends to backend pasted url and receives link data
-   * @param {string} url - link source url
-   */
-  async fetchLinkData(url) {
-    this._showProgress();
-    // this.data = { link: url };
-    this.data.link = url;
-
-    try {
-      // const response = await ajax.get({
-      //   url: this.config.endpoint,
-      //   data: {
-      //     url,
-      //   },
-      // });
-
-      // this.onFetch(response);
-      const response = await this.getFakeData();
-
-      console.log('the response: ', response);
-      this.onFetch(response);
-    } catch (error) {
-      this.fetchingFailed('服务器：解析错误，请输入正确的 URL 地址');
-    }
-  }
-
-  /**
-   * Link data fetching callback
-   * @param {UploadResponseFormat} response
-   */
-  onFetch(response) {
-    if (!response || !response.success) {
-      this.fetchingFailed('Can not get this link data, try another');
-      return;
-    }
-
-    const metaData = response.meta;
-
-    this.data.meta = metaData;
-
-    if (!metaData) {
-      this.fetchingFailed('Wrong response format from server');
-      return;
-    }
-
-    this._hideProgress().then(() => {
-      this.nodes.inputHolder.remove();
-      this.changeView('card');
-    });
-  }
-
-  /**
-   * If data fetching failed, set input error style
-   */
-  applyErrorStyle() {
-    this.nodes.inputHolder.classList.add(this.CSS.inputError);
-    this.nodes.progress.remove();
-  }
-
-  /**
-   * Handle link fetching errors
-   * @private
-   *
-   * @param {string} errorMessage
-   */
-  fetchingFailed(errorMessage) {
-    this.api.notifier.show({
-      message: errorMessage,
-      style: 'error'
-    });
-
-    this.applyErrorStyle();
-  }
-
-  /**
-   * buildCardView
-   */
-  buildCardView() {
-    console.log('buildCardView this.data: ', this.data);
-
+  drawView() {
     const wrapperEl = make('div', this.CSS.baseClass);
     const containerEl = make('div', this.CSS.container);
 
-    this.nodes.container = containerEl;
-    this.nodes.linkContent = this._prepareLinkPreview();
+    this.nodes.defaultTable = this._drawDefaultTable();
 
-    containerEl.appendChild(this.nodes.linkContent);
-    this._showLinkPreview(this.data.meta);
-
+    containerEl.appendChild(this.nodes.defaultTable);
     wrapperEl.appendChild(containerEl);
 
     return wrapperEl;
   }
 
   /**
-   * buildInputView
+   * draw table element
    */
-  buildInputView() {
-    const wrapperEl = make('div', this.CSS.baseClass);
-    const containerEl = make('div', this.CSS.container);
+  _drawDefaultTable() {
+    const TableEl = make('table', this.CSS.table);
+    const TBodyEl = make('tbody');
 
-    this.nodes.inputHolder = this._makeInputHolder();
+    // tr-1
+    const TrEl1 = make('tr', 'tr');
 
-    containerEl.appendChild(this.nodes.inputHolder);
-    wrapperEl.appendChild(containerEl);
-
-    return wrapperEl;
-  }
-
-  /**
-   * for buildInputView
-   * Prepare input holder
-   * @return {HTMLElement} - url input
-   * @private
-   */
-  _makeInputHolder() {
-    const inputHolder = make('div', this.CSS.inputHolder);
-
-    this.nodes.progress = make('label', this.CSS.progress);
-    this.nodes.input = make('div', [this.CSS.input, this.CSS.inputEl], {
+    const TdEl11 = make('td', 'th');
+    const Cell11 = make('div', this.CSS.cell, {
+      innerHTML: 'Month',
       contentEditable: true
     });
 
-    // TODO: i18n
-    this.nodes.input.dataset.placeholder = '链接地址';
+    TdEl11.appendChild(Cell11);
 
-    this.nodes.input.addEventListener('paste', (event) => {
-      this.startFetching(event);
+    const TdEl12 = make('td', 'th');
+    const Cell12 = make('div', this.CSS.cell, {
+      innerHTML: 'Month',
+      contentEditable: true
     });
 
-    this.nodes.input.addEventListener('keydown', (event) => {
-      const [ENTER, A] = [13, 65];
-      const cmdPressed = event.ctrlKey || event.metaKey;
+    TdEl12.appendChild(Cell12);
 
-      switch (event.keyCode) {
-        case ENTER:
-          event.preventDefault();
-          event.stopPropagation();
+    TrEl1.appendChild(TdEl11);
+    TrEl1.appendChild(TdEl12);
 
-          this.startFetching(event);
-          break;
-        case A:
-          if (cmdPressed) {
-            this.selectLinkUrl(event);
-          }
-          break;
-      }
+    // tr2
+    const TrEl2 = make('tr', 'tr');
+    const TdEl21 = make('td', 'th');
+    const Cell21 = make('div', this.CSS.cell, {
+      innerHTML: 'Month-cell',
+      contentEditable: true
     });
 
-    inputHolder.appendChild(this.nodes.progress);
-    inputHolder.appendChild(this.nodes.input);
+    TdEl21.appendChild(Cell21);
 
-    return inputHolder;
-  }
-
-  /**
-   * Activates link data fetching by url
-   */
-  startFetching(event) {
-    let url = this.nodes.input.textContent;
-
-    if (event.type === 'paste') {
-      url = (event.clipboardData || window.clipboardData).getData('text');
-    }
-
-    this.removeErrorStyle();
-    this.fetchLinkData(url);
-  }
-
-  /**
-   * If previous link data fetching failed, remove error styles
-   */
-  removeErrorStyle() {
-    this.nodes.inputHolder.classList.remove(this.CSS.inputError);
-    this.nodes.inputHolder.insertBefore(this.nodes.progress, this.nodes.input);
-  }
-
-  /**
-   * Show loading progressbar
-   * @private
-   */
-  _showProgress() {
-    this.nodes.progress.classList.add(this.CSS.progressLoading);
-  }
-
-  /**
-   * Hide loading progressbar
-   * @private
-   */
-  _hideProgress() {
-    return new Promise((resolve) => {
-      this.nodes.progress.classList.remove(this.CSS.progressLoading);
-      this.nodes.progress.classList.add(this.CSS.progressLoaded);
-
-      setTimeout(resolve, 500);
-    });
-  }
-
-  /**
-   * for buildCardView: Prepare link preview holder
-   * @return {HTMLElement}
-   * @private
-   */
-  _prepareLinkPreview() {
-    const { linkContent } = this.CSS;
-
-    const holder = make('a', linkContent, {
-      target: '_blank',
-      rel: 'nofollow noindex noreferrer'
+    const TdEl22 = make('td', 'th');
+    const Cell22 = make('div', this.CSS.cell, {
+      innerHTML: 'Month-cell',
+      contentEditable: true
     });
 
-    this.nodes.linkImage = make('div', this.CSS.linkImage);
-    this.nodes.linkTitle = make('div', this.CSS.linkTitle);
-    this.nodes.linkDescription = make('p', this.CSS.linkDescription);
-    this.nodes.linkText = make('a', this.CSS.linkText);
+    TdEl22.appendChild(Cell22);
 
-    return holder;
-  }
+    TrEl2.appendChild(TdEl21);
+    TrEl2.appendChild(TdEl22);
 
-  /**
-   * * for buildCardView: Compose link preview from fetched data
-   * @param {metaData} meta - link meta data
-   * @private
-   */
-  _showLinkPreview({ image, title, description }) {
-    this.nodes.container.appendChild(this.nodes.linkContent);
+    //
+    TBodyEl.appendChild(TrEl1);
+    TBodyEl.appendChild(TrEl2);
 
-    if (image && image.url) {
-      this.nodes.linkImage.style.backgroundImage = 'url(' + image.url + ')';
-      this.nodes.linkContent.appendChild(this.nodes.linkImage);
-    }
+    TableEl.appendChild(TBodyEl);
 
-    if (title) {
-      this.nodes.linkTitle.textContent = title;
-      this.nodes.linkContent.appendChild(this.nodes.linkTitle);
-    }
-
-    if (description) {
-      this.nodes.linkDescription.textContent = description;
-      this.nodes.linkContent.appendChild(this.nodes.linkDescription);
-    }
-
-    const { link } = this.data;
-    const linkAddr = link.indexOf('http') === 0 ? link : `http://${link}`;
-
-    this.nodes.linkContent.classList.add(this.CSS.linkContentRendered);
-    this.nodes.linkContent.setAttribute('href', linkAddr);
-    this.nodes.linkContent.appendChild(this.nodes.linkText);
-
-    try {
-      this.nodes.linkText.textContent = new URL(this.data.link).hostname;
-      this.nodes.linkText.href = this.data.link;
-    } catch (e) {
-      const addr = this.data.link;
-
-      this.nodes.linkText.textContent = addr;
-      this.nodes.linkText.href = addr;
-    }
+    return TableEl;
   }
 }

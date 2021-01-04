@@ -87,8 +87,7 @@ export default class Table {
     this.ui = new Ui({
       api,
       config: this.config,
-      data: this.data,
-      changeView: this.changeView.bind(this)
+      data: this.data
       // setTune: this.setTune.bind(this),
       // setData: this.setData.bind(this),
     });
@@ -101,32 +100,9 @@ export default class Table {
    * @return {HTMLDivElement}
    */
   render() {
-    /**
-     * If Tool already has data, render link preview, otherwise insert input
-     */
-    if (Object.keys(this.data.meta).length) {
-      this.element = this.ui.buildInputView();
-      // return this.ui.buildCardView();
-    } else {
-      this.element = this.ui.buildInputView();
-    }
+    this.element = this.ui.drawView();
 
     return this.element;
-  }
-
-  /**
-   * change the current view
-   */
-  changeView(view) {
-    switch (view) {
-      case 'card': {
-        return this.replaceElement(this.ui.buildCardView());
-      }
-
-      default: {
-        return this.replaceElement(this.ui.buildInputView());
-      }
-    }
   }
 
   /**
