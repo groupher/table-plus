@@ -2,7 +2,7 @@
 import ajax from "@codexteam/ajax";
 // eslint-disable-next-line
 import polyfill from "url-polyfill";
-import { make, findIndex } from "@groupher/editor-utils";
+import { make, findIndex, clazz } from "@groupher/editor-utils";
 
 /**
  * @description the ui parts
@@ -26,8 +26,8 @@ export default class UI {
 
     this.nodes = {
       // root element
-      wrapper: null,
-      container: null,
+      wrapperEl: null,
+      // container: null,
       defaultTable: null,
     };
 
@@ -85,6 +85,7 @@ export default class UI {
 
     this.columnHandlers = [];
     this.rowHandlers = [];
+    this.activeColumnIndex = null;
   }
 
   /**
@@ -104,6 +105,9 @@ export default class UI {
       cell: "cdx-table__cell",
       columnHandler: "cdx-table__column_handler",
       rowHandler: "cdx-table__row_handler",
+      activeTd: "cdx-table__active",
+      activeTdTop: "cdx-table__active_top",
+      activeTdBottom: "cdx-table__active_bottom",
     };
   }
 
@@ -118,6 +122,17 @@ export default class UI {
 
     containerEl.appendChild(this.nodes.defaultTable);
     wrapperEl.appendChild(containerEl);
+
+    // if click outside, then clean up the active status
+    // see: https://stackoverflow.com/a/28432139/4050784
+    document.addEventListener("click", (e) => {
+      const isClickOutside = !wrapperEl.contains(e.target);
+      if (isClickOutside) {
+        this._cleanUpHandlers();
+      }
+    });
+
+    this.nodes.wrapperEl = wrapperEl;
 
     return wrapperEl;
   }
@@ -168,6 +183,8 @@ export default class UI {
       innerHTML: item.text,
       contentEditable: true,
       "data-index": item.index,
+      "data-row-index": this._whichRow(item.index),
+      "data-column-index": this._whichColumn(item.index),
     });
 
     TdEl.appendChild(CellEl);
@@ -194,30 +211,6 @@ export default class UI {
     });
 
     return TdEl;
-  }
-
-  /**
-   * judge column by given index
-   * @param {Number} index
-   * @return {Number}
-   * @memberof UI
-   */
-  _whichColumn(index) {
-    const { columnCount } = this.data;
-
-    return parseInt(index) % columnCount;
-  }
-
-  /**
-   * judge row by given index
-   * @param {Number} index
-   * @return {Number}
-   * @memberof UI
-   */
-  _whichRow(index) {
-    const { columnCount } = this.data;
-
-    return Math.floor(parseInt(index) / columnCount);
   }
 
   /**
@@ -276,6 +269,24 @@ export default class UI {
   }
 
   /**
+   * _cleanUpHandlers
+   * @memberof UI
+   */
+  _cleanUpHandlers() {
+    for (let i = 0; i < this.rowHandlers.length; i += 1) {
+      const handlerEl = this.rowHandlers[i];
+
+      handlerEl.style.opacity = 0;
+    }
+
+    for (let i = 0; i < this.columnHandlers.length; i += 1) {
+      const handlerEl = this.columnHandlers[i];
+
+      handlerEl.style.opacity = 0;
+    }
+  }
+
+  /**
    * draw column handler
    *
    * @memberof UI
@@ -283,6 +294,10 @@ export default class UI {
   _drawColumnSettingHandler(item) {
     const HandlerEl = make("div", this.CSS.columnHandler, {
       "data-column-index": this._whichColumn(item.index),
+    });
+
+    HandlerEl.addEventListener("click", (e) => {
+      this._highlightColumn(item.index);
     });
 
     return HandlerEl;
@@ -299,6 +314,63 @@ export default class UI {
     });
 
     return HandlerEl;
+  }
+
+  /**
+   * highlight column
+   *
+   * @memberof UI
+   */
+  _highlightColumn(index) {
+    this.activeColumnIndex = index;
+
+    const allColumnEls = this.nodes.wrapperEl.querySelectorAll(
+      `.${this.CSS.cell}[data-column-index]`
+    );
+
+    allColumnEls.forEach((item) => {
+      clazz.remove(item.parentNode, this.CSS.activeTd);
+      clazz.remove(item.parentNode, this.CSS.activeTdTop);
+      clazz.remove(item.parentNode, this.CSS.activeTdBottom);
+    });
+
+    const columnEls = this.nodes.wrapperEl.querySelectorAll(
+      `.${this.CSS.cell}[data-column-index="${index}"]`
+    );
+
+    columnEls.forEach((item, idx) => {
+      clazz.toggle(item.parentNode, this.CSS.activeTd);
+      if (idx === 0) {
+        clazz.toggle(item.parentNode, this.CSS.activeTdTop);
+      }
+      if (idx === columnEls.length - 1) {
+        clazz.toggle(item.parentNode, this.CSS.activeTdBottom);
+      }
+    });
+  }
+
+  /**
+   * judge column by given index
+   * @param {Number} index
+   * @return {Number}
+   * @memberof UI
+   */
+  _whichColumn(index) {
+    const { columnCount } = this.data;
+
+    return parseInt(index) % columnCount;
+  }
+
+  /**
+   * judge row by given index
+   * @param {Number} index
+   * @return {Number}
+   * @memberof UI
+   */
+  _whichRow(index) {
+    const { columnCount } = this.data;
+
+    return Math.floor(parseInt(index) / columnCount);
   }
 
   // _highlightRow () {}
