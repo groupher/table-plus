@@ -2,7 +2,7 @@
 import ajax from "@codexteam/ajax";
 // eslint-disable-next-line
 import polyfill from "url-polyfill";
-import { make } from '@groupher/editor-utils';
+import { make, findIndex } from '@groupher/editor-utils';
 
 /**
  * @description the ui parts
@@ -36,7 +36,42 @@ export default class UI {
       meta: {}
     };
 
-    this.data = data;
+    // this.data = data;
+    this.data = {
+      // 斑马线?
+      // 有表头？
+      // rowCount: 2
+      columnCount: 3,
+      items: [
+        {
+          text: 'cell 0',
+          index: 0
+          // align: '..',
+        },
+        {
+          text: 'cell 1',
+          index: 1
+        },
+        {
+          text: 'cell 2',
+          index: 2
+        },
+        {
+          text: 'cell 3',
+          index: 3
+        },
+        {
+          text: 'cell 4',
+          index: 4
+        },
+        {
+          text: 'cell 5',
+          index: 5
+        }
+      ]
+    };
+
+    this.rowHandlers = [];
   }
 
   /**
@@ -53,7 +88,8 @@ export default class UI {
        */
       container: 'cdx-table-wrapper',
       table: 'cdx-table',
-      cell: 'cdx-table__cell'
+      cell: 'cdx-table__cell',
+      handler: 'cdx-table__handler'
     };
   }
 
@@ -79,55 +115,112 @@ export default class UI {
     const TableEl = make('table', this.CSS.table);
     const TBodyEl = make('tbody');
 
-    // tr-1
-    const TrEl1 = make('tr', 'tr');
+    const { columnCount, items } = this.data;
 
-    const TdEl11 = make('td', 'th');
-    const Cell11 = make('div', this.CSS.cell, {
-      innerHTML: 'Month',
-      contentEditable: true
-    });
+    for (let i = 0; i < items.length; i += columnCount) {
+      const rowCellItems = items.slice(i, i + columnCount);
 
-    TdEl11.appendChild(Cell11);
-
-    const TdEl12 = make('td', 'th');
-    const Cell12 = make('div', this.CSS.cell, {
-      innerHTML: 'Month',
-      contentEditable: true
-    });
-
-    TdEl12.appendChild(Cell12);
-
-    TrEl1.appendChild(TdEl11);
-    TrEl1.appendChild(TdEl12);
-
-    // tr2
-    const TrEl2 = make('tr', 'tr');
-    const TdEl21 = make('td', 'th');
-    const Cell21 = make('div', this.CSS.cell, {
-      innerHTML: 'Month-cell',
-      contentEditable: true
-    });
-
-    TdEl21.appendChild(Cell21);
-
-    const TdEl22 = make('td', 'th');
-    const Cell22 = make('div', this.CSS.cell, {
-      innerHTML: 'Month-cell',
-      contentEditable: true
-    });
-
-    TdEl22.appendChild(Cell22);
-
-    TrEl2.appendChild(TdEl21);
-    TrEl2.appendChild(TdEl22);
-
-    //
-    TBodyEl.appendChild(TrEl1);
-    TBodyEl.appendChild(TrEl2);
+      TBodyEl.appendChild(this._drawRow(rowCellItems));
+    }
 
     TableEl.appendChild(TBodyEl);
 
     return TableEl;
   }
+
+  /**
+   * draw a table row
+   *
+   * @memberof UI
+   */
+  _drawRow(items) {
+    const RowEl = make('tr');
+
+    items.forEach((item) => {
+      RowEl.appendChild(this._drawCell(item));
+    });
+
+    return RowEl;
+  }
+
+  /**
+   * draw cell in table row
+   *
+   * @memberof UI
+   */
+  _drawCell(item) {
+    const TdEl = make('td');
+    const CellEl = make('div', this.CSS.cell, {
+      innerHTML: item.text,
+      contentEditable: true,
+      'data-index': item.index
+    });
+
+    TdEl.appendChild(CellEl);
+
+    if (item.index < this.data.columnCount) {
+      const RowHandlerEl = this._drawRowSettingHandler(item);
+
+      TdEl.appendChild(RowHandlerEl);
+      this.rowHandlers.push(RowHandlerEl);
+    }
+
+    TdEl.addEventListener('mouseover', ({ target: { dataset } }) => {
+      if (dataset.index) {
+        this._showColumnHandler(dataset.index);
+      }
+    });
+
+    return TdEl;
+  }
+
+  /**
+   * judge column by given index
+   *
+   * @memberof UI
+   */
+  _whichColumn(index) {
+    const { columnCount } = this.data;
+
+    return parseInt(index) % columnCount;
+  }
+
+  /**
+   *
+   * @param {Number} index
+   * @memberof UI
+   */
+  _showColumnHandler(index) {
+    const columnIndex = this._whichColumn(index);
+
+    const targetIndex = findIndex(this.rowHandlers, (item) => {
+      return parseInt(item.dataset.columnIndex) === columnIndex;
+    });
+
+    if (targetIndex >= 0) {
+      for (let i = 0; i < this.rowHandlers.length; i += 1) {
+        const handlerEl = this.rowHandlers[i];
+
+        handlerEl.style.opacity = 0;
+      }
+      this.rowHandlers[targetIndex].style.opacity = 1;
+    }
+
+    return targetIndex;
+  }
+
+  /**
+   * draw handler
+   *
+   * @memberof UI
+   */
+  _drawRowSettingHandler(item) {
+    const HandlerEl = make('div', this.CSS.handler, {
+      'data-column-index': this._whichColumn(item.index)
+    });
+
+    return HandlerEl;
+  }
+  // _highlightRow () {}
+  // _highlightColumn () {}
 }
