@@ -20,7 +20,7 @@
   } */
 
   &__cell {
-    padding: 10px;
+    padding: 12px 10px;
     vertical-align: top;
     outline: none;
   }
@@ -30,12 +30,30 @@
     border: 1px solid #dbdbe2;
   }
 
-  &__handler {
+  &__column_handler {
     position: absolute;
     top: -18px;
     left: calc(50% - 30px);
     width: 60px;
     height: 8px;
+    background: #eff2f5;
+    border-radius: 4px;
+    opacity: 0;
+
+    &:hover {
+      cursor: pointer;
+      background: #e0e0e0;
+    }
+
+    transition: all 0.3s;
+  }
+
+  &__row_handler {
+    position: absolute;
+    top: calc(50% - 15px);
+    left: -20px;
+    width: 8px;
+    height: 30px;
     background: #eff2f5;
     border-radius: 4px;
     opacity: 0;
