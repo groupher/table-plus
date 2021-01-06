@@ -105,9 +105,13 @@ export default class UI {
       cell: "cdx-table__cell",
       columnHandler: "cdx-table__column_handler",
       rowHandler: "cdx-table__row_handler",
-      activeTd: "cdx-table__active",
+
+      activeColumnTd: "cdx-table__active_column",
+      activeRowTd: "cdx-table__active_row",
       activeTdTop: "cdx-table__active_top",
       activeTdBottom: "cdx-table__active_bottom",
+      activeTdLeft: "cdx-table__active_left",
+      activeTdRight: "cdx-table__active_right",
     };
   }
 
@@ -127,8 +131,10 @@ export default class UI {
     // see: https://stackoverflow.com/a/28432139/4050784
     document.addEventListener("click", (e) => {
       const isClickOutside = !wrapperEl.contains(e.target);
+
       if (isClickOutside) {
         this._cleanUpHandlers();
+        this._cleanUpHighlights();
       }
     });
 
@@ -269,24 +275,6 @@ export default class UI {
   }
 
   /**
-   * _cleanUpHandlers
-   * @memberof UI
-   */
-  _cleanUpHandlers() {
-    for (let i = 0; i < this.rowHandlers.length; i += 1) {
-      const handlerEl = this.rowHandlers[i];
-
-      handlerEl.style.opacity = 0;
-    }
-
-    for (let i = 0; i < this.columnHandlers.length; i += 1) {
-      const handlerEl = this.columnHandlers[i];
-
-      handlerEl.style.opacity = 0;
-    }
-  }
-
-  /**
    * draw column handler
    *
    * @memberof UI
@@ -313,6 +301,10 @@ export default class UI {
       "data-row-index": this._whichRow(item.index),
     });
 
+    HandlerEl.addEventListener("click", (e) => {
+      this._highlightRow(item.index);
+    });
+
     return HandlerEl;
   }
 
@@ -323,28 +315,45 @@ export default class UI {
    */
   _highlightColumn(index) {
     this.activeColumnIndex = index;
-
-    const allColumnEls = this.nodes.wrapperEl.querySelectorAll(
-      `.${this.CSS.cell}[data-column-index]`
-    );
-
-    allColumnEls.forEach((item) => {
-      clazz.remove(item.parentNode, this.CSS.activeTd);
-      clazz.remove(item.parentNode, this.CSS.activeTdTop);
-      clazz.remove(item.parentNode, this.CSS.activeTdBottom);
-    });
+    this._unHighlightCells();
 
     const columnEls = this.nodes.wrapperEl.querySelectorAll(
       `.${this.CSS.cell}[data-column-index="${index}"]`
     );
 
     columnEls.forEach((item, idx) => {
-      clazz.toggle(item.parentNode, this.CSS.activeTd);
+      clazz.toggle(item.parentNode, this.CSS.activeColumnTd);
       if (idx === 0) {
         clazz.toggle(item.parentNode, this.CSS.activeTdTop);
       }
       if (idx === columnEls.length - 1) {
         clazz.toggle(item.parentNode, this.CSS.activeTdBottom);
+      }
+    });
+  }
+
+  /**
+   * highlight column
+   *
+   * @memberof UI
+   */
+  _highlightRow(index) {
+    this.activeColumnIndex = index;
+    this._unHighlightCells();
+
+    const rowIndex = this._whichRow(index);
+
+    const rowEls = this.nodes.wrapperEl.querySelectorAll(
+      `.${this.CSS.cell}[data-row-index="${rowIndex}"]`
+    );
+
+    rowEls.forEach((item, idx) => {
+      clazz.toggle(item.parentNode, this.CSS.activeRowTd);
+      if (idx === 0) {
+        clazz.toggle(item.parentNode, this.CSS.activeTdLeft);
+      }
+      if (idx === rowEls.length - 1) {
+        clazz.toggle(item.parentNode, this.CSS.activeTdRight);
       }
     });
   }
@@ -373,6 +382,51 @@ export default class UI {
     return Math.floor(parseInt(index) / columnCount);
   }
 
-  // _highlightRow () {}
-  // _highlightColumn () {}
+  /**
+   * _cleanUpHandlers
+   * @memberof UI
+   */
+  _cleanUpHandlers() {
+    for (let i = 0; i < this.rowHandlers.length; i += 1) {
+      const handlerEl = this.rowHandlers[i];
+
+      handlerEl.style.opacity = 0;
+    }
+
+    for (let i = 0; i < this.columnHandlers.length; i += 1) {
+      const handlerEl = this.columnHandlers[i];
+
+      handlerEl.style.opacity = 0;
+    }
+  }
+
+  /**
+   * clean up highlighted column or row, if needed
+   *
+   * @memberof UI
+   */
+  _cleanUpHighlights() {
+    this._unHighlightCells();
+  }
+
+  /**
+   * _unHighlightCells
+   *
+   * @memberof UI
+   */
+  _unHighlightCells() {
+    const allColumnEls = this.nodes.wrapperEl.querySelectorAll(
+      `.${this.CSS.cell}`
+    );
+
+    allColumnEls.forEach((item) => {
+      clazz.remove(item.parentNode, this.CSS.activeColumnTd);
+      clazz.remove(item.parentNode, this.CSS.activeRowTd);
+
+      clazz.remove(item.parentNode, this.CSS.activeTdTop);
+      clazz.remove(item.parentNode, this.CSS.activeTdBottom);
+      clazz.remove(item.parentNode, this.CSS.activeTdLeft);
+      clazz.remove(item.parentNode, this.CSS.activeTdRight);
+    });
+  }
 }
