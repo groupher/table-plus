@@ -4,6 +4,14 @@ import ajax from "@codexteam/ajax";
 import polyfill from "url-polyfill";
 import { make, findIndex, clazz } from "@groupher/editor-utils";
 
+import DragIcon from "./svg/drag.svg";
+import AddIcon from "./svg/add.svg";
+import DeleteIcon from "./svg/delete.svg";
+
+import AlignCenterIcon from "./svg/align-center.svg";
+// import AlignLeftIcon from './svg/align-left.svg';
+// import AlignRightIcon from './svg/align-right.svg';
+
 /**
  * @description the ui parts
  *
@@ -83,9 +91,16 @@ export default class UI {
       ],
     };
 
+    this.lastFocusedTdIndex = null;
+
     this.columnHandlers = [];
+    this.columnActions = [];
+
     this.rowHandlers = [];
+    this.rowActions = [];
+
     this.activeColumnIndex = null;
+    this.activeRowIndex = null;
   }
 
   /**
@@ -104,7 +119,12 @@ export default class UI {
       table: "cdx-table",
       cell: "cdx-table__cell",
       columnHandler: "cdx-table__column_handler",
+      columnActions: "cdx-table__column_actions",
+      columnActionIcon: "cdx-table__column_action_icon",
+
       rowHandler: "cdx-table__row_handler",
+      rowActions: "cdx-table__row_actions",
+      rowActionIcon: "cdx-table__row_action_icon",
 
       activeColumnTd: "cdx-table__active_column",
       activeRowTd: "cdx-table__active_row",
@@ -135,6 +155,9 @@ export default class UI {
       if (isClickOutside) {
         this._cleanUpHandlers();
         this._cleanUpHighlights();
+
+        this.activeColumnIndex = null;
+        this.activeRowIndex = null;
       }
     });
 
@@ -197,26 +220,215 @@ export default class UI {
 
     if (item.index < this.data.columnCount) {
       const HandlerEl = this._drawColumnSettingHandler(item);
+      const ActionsEl = this._drawColumnActions(item);
 
       TdEl.appendChild(HandlerEl);
+      TdEl.appendChild(ActionsEl);
+
       this.columnHandlers.push(HandlerEl);
+      this.columnActions.push(ActionsEl);
     }
 
     if (item.index % this.data.columnCount === 0) {
       const HandlerEl = this._drawRowSettingHandler(item);
+      const ActionsEl = this._drawRowActions(item);
 
       TdEl.appendChild(HandlerEl);
+      TdEl.appendChild(ActionsEl);
+
       this.rowHandlers.push(HandlerEl);
+      this.rowActions.push(ActionsEl);
     }
 
+    CellEl.addEventListener("click", ({ target: { dataset } }) => {
+      if (
+        this.lastFocusedTdIndex &&
+        this.lastFocusedTdIndex !== dataset.index
+      ) {
+        this._cleanUpHighlights();
+      }
+      this.lastFocusedTdIndex = dataset.index;
+    });
+
     TdEl.addEventListener("click", ({ target: { dataset } }) => {
-      if (dataset.index) {
+      if (this._whichColumn(dataset.index) !== this.activeColumnIndex) {
         this._showColumnHandler(dataset.index);
+      }
+
+      if (this._whichRow(dataset.index) !== this.activeRowIndex) {
         this._showRowHandler(dataset.index);
       }
     });
 
     return TdEl;
+  }
+
+  /**
+   * draw column actions
+   *
+   * @memberof UI
+   */
+  _drawColumnActions(item) {
+    const WrapperEl = make("div", this.CSS.columnActions, {
+      "data-column-index": this._whichColumn(item.index),
+    });
+
+    const DragEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: DragIcon,
+    });
+
+    const AddEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: AddIcon,
+    });
+
+    const DeleteEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: DeleteIcon,
+    });
+
+    const AlignCenterEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: AlignCenterIcon,
+    });
+
+    DeleteEl.addEventListener("click", (e) => {
+      console.log("delete it");
+    });
+
+    this.api.tooltip.onHover(AddEl, "增加一列", { delay: 1500 });
+    this.api.tooltip.onHover(DeleteEl, "删除当前列", { delay: 1500 });
+    this.api.tooltip.onHover(AlignCenterEl, "对齐方式", { delay: 1500 });
+
+    WrapperEl.appendChild(DragEl);
+    WrapperEl.appendChild(AlignCenterEl);
+    WrapperEl.appendChild(AddEl);
+    WrapperEl.appendChild(DeleteEl);
+
+    return WrapperEl;
+  }
+
+  /**
+   * draw column actions
+   *
+   * @memberof UI
+   */
+  _drawRowActions(item) {
+    const WrapperEl = make("div", this.CSS.rowActions, {
+      "data-row-index": this._whichRow(item.index),
+    });
+
+    const DragEl = make("div", this.CSS.rowActionIcon, {
+      innerHTML: DragIcon,
+    });
+
+    const AddEl = make("div", this.CSS.rowActionIcon, {
+      innerHTML: AddIcon,
+    });
+
+    const DeleteEl = make("div", this.CSS.rowActionIcon, {
+      innerHTML: DeleteIcon,
+    });
+
+    DeleteEl.addEventListener("click", (e) => {
+      console.log("delete it");
+    });
+
+    this.api.tooltip.onHover(AddEl, "增加一行", {
+      delay: 1500,
+      placement: "right",
+    });
+    this.api.tooltip.onHover(DeleteEl, "删除当前行", {
+      delay: 1500,
+      placement: "right",
+    });
+
+    WrapperEl.appendChild(DragEl);
+    WrapperEl.appendChild(AddEl);
+    WrapperEl.appendChild(DeleteEl);
+
+    return WrapperEl;
+  }
+
+  /**
+   * draw column handler
+   *
+   * @memberof UI
+   */
+  _drawColumnSettingHandler(item) {
+    const HandlerEl = make("div", this.CSS.columnHandler, {
+      "data-column-index": this._whichColumn(item.index),
+    });
+
+    HandlerEl.addEventListener("click", (e) => {
+      this._highlightColumn(item.index);
+      this._cleanUpHandlers();
+      this._showColumnActions(item.index);
+    });
+
+    return HandlerEl;
+  }
+
+  /**
+   * draw raw handler
+   *
+   * @memberof UI
+   */
+  _drawRowSettingHandler(item) {
+    const HandlerEl = make("div", this.CSS.rowHandler, {
+      "data-row-index": this._whichRow(item.index),
+    });
+
+    HandlerEl.addEventListener("click", (e) => {
+      this._highlightRow(item.index);
+      this._cleanUpHandlers();
+      this._showRowActions(item.index);
+    });
+
+    return HandlerEl;
+  }
+
+  /**
+   *
+   * @param {Number} index
+   * @memberof UI
+   */
+  _showColumnActions(index) {
+    const columnIndex = this._whichColumn(index);
+    const handlerEls = this.columnActions;
+
+    const targetIndex = findIndex(handlerEls, (item) => {
+      return parseInt(item.dataset.columnIndex) === columnIndex;
+    });
+
+    if (targetIndex >= 0) {
+      for (let i = 0; i < handlerEls.length; i += 1) {
+        const handlerEl = handlerEls[i];
+
+        handlerEl.style.display = "none";
+      }
+      handlerEls[targetIndex].style.display = "flex";
+    }
+  }
+
+  /**
+   *
+   * @param {Number} index
+   * @memberof UI
+   */
+  _showRowActions(index) {
+    const rowIndex = this._whichRow(index);
+    const handlerEls = this.rowActions;
+
+    const targetIndex = findIndex(handlerEls, (item) => {
+      return parseInt(item.dataset.rowIndex) === rowIndex;
+    });
+
+    if (targetIndex >= 0) {
+      for (let i = 0; i < handlerEls.length; i += 1) {
+        const handlerEl = handlerEls[i];
+
+        handlerEl.style.display = "none";
+      }
+      handlerEls[targetIndex].style.display = "flex";
+    }
   }
 
   /**
@@ -236,9 +448,9 @@ export default class UI {
       for (let i = 0; i < handlerEls.length; i += 1) {
         const handlerEl = handlerEls[i];
 
-        handlerEl.style.opacity = 0;
+        handlerEl.style.display = "none";
       }
-      handlerEls[targetIndex].style.opacity = 1;
+      handlerEls[targetIndex].style.display = "block";
     }
 
     return targetIndex;
@@ -266,46 +478,12 @@ export default class UI {
       for (let i = 0; i < handlerEls.length; i += 1) {
         const handlerEl = handlerEls[i];
 
-        handlerEl.style.opacity = 0;
+        handlerEl.style.display = "none";
       }
-      handlerEls[targetIndex].style.opacity = 1;
+      handlerEls[targetIndex].style.display = "block";
     }
 
     return targetIndex;
-  }
-
-  /**
-   * draw column handler
-   *
-   * @memberof UI
-   */
-  _drawColumnSettingHandler(item) {
-    const HandlerEl = make("div", this.CSS.columnHandler, {
-      "data-column-index": this._whichColumn(item.index),
-    });
-
-    HandlerEl.addEventListener("click", (e) => {
-      this._highlightColumn(item.index);
-    });
-
-    return HandlerEl;
-  }
-
-  /**
-   * draw raw handler
-   *
-   * @memberof UI
-   */
-  _drawRowSettingHandler(item) {
-    const HandlerEl = make("div", this.CSS.rowHandler, {
-      "data-row-index": this._whichRow(item.index),
-    });
-
-    HandlerEl.addEventListener("click", (e) => {
-      this._highlightRow(item.index);
-    });
-
-    return HandlerEl;
   }
 
   /**
@@ -338,7 +516,7 @@ export default class UI {
    * @memberof UI
    */
   _highlightRow(index) {
-    this.activeColumnIndex = index;
+    this.activeRowIndex = index;
     this._unHighlightCells();
 
     const rowIndex = this._whichRow(index);
@@ -390,13 +568,13 @@ export default class UI {
     for (let i = 0; i < this.rowHandlers.length; i += 1) {
       const handlerEl = this.rowHandlers[i];
 
-      handlerEl.style.opacity = 0;
+      handlerEl.style.display = "none";
     }
 
     for (let i = 0; i < this.columnHandlers.length; i += 1) {
       const handlerEl = this.columnHandlers[i];
 
-      handlerEl.style.opacity = 0;
+      handlerEl.style.display = "none";
     }
   }
 
@@ -407,6 +585,7 @@ export default class UI {
    */
   _cleanUpHighlights() {
     this._unHighlightCells();
+    this._hideAllActions();
   }
 
   /**
@@ -428,5 +607,20 @@ export default class UI {
       clazz.remove(item.parentNode, this.CSS.activeTdLeft);
       clazz.remove(item.parentNode, this.CSS.activeTdRight);
     });
+  }
+
+  /**
+   * hide all actions
+   *
+   * @memberof UI
+   */
+  _hideAllActions() {
+    const actionsEls = [...this.columnActions, ...this.rowActions];
+
+    for (let i = 0; i < actionsEls.length; i += 1) {
+      const actionsEl = actionsEls[i];
+
+      actionsEl.style.display = "none";
+    }
   }
 }
