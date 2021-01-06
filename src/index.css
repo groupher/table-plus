@@ -100,7 +100,10 @@
   &__column_action_icon {
     margin-right: 8px;
     cursor: pointer;
-    opacity: 0.6;
+
+    svg {
+      fill: #0599cc;
+    }
 
     &:hover {
       cursor: pointer;
@@ -112,10 +115,11 @@
 
   &__row_actions {
     position: absolute;
-    top: -5px;
-    left: -30px;
-    width: 25px;
-    height: 48px;
+    top: 5px;
+    left: -45px;
+    width: 32px;
+    flex-wrap: wrap;
+    height: 32px;
     justify-content: space-between;
     flex-direction: column;
 
@@ -124,7 +128,10 @@
 
   &__row_action_icon {
     cursor: pointer;
-    opacity: 0.6;
+
+    svg {
+      fill: #0599cc;
+    }
 
     &:hover {
       cursor: pointer;

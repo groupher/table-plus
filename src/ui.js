@@ -4,7 +4,11 @@ import ajax from "@codexteam/ajax";
 import polyfill from "url-polyfill";
 import { make, findIndex, clazz } from '@groupher/editor-utils';
 
-import DragIcon from './svg/drag.svg';
+import MoveLeftIcon from './svg/move-left.svg';
+import MoveRightIcon from './svg/move-right.svg';
+import MoveUpIcon from './svg/move-up.svg';
+import MoveDownIcon from './svg/move-down.svg';
+
 import AddIcon from './svg/add.svg';
 import DeleteIcon from './svg/delete.svg';
 
@@ -260,8 +264,12 @@ export default class UI {
       'data-column-index': this._whichColumn(item.index)
     });
 
-    const DragEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: DragIcon
+    const MoveLeftEl = make('div', this.CSS.columnActionIcon, {
+      innerHTML: MoveLeftIcon
+    });
+
+    const MoveRightEl = make('div', this.CSS.columnActionIcon, {
+      innerHTML: MoveRightIcon
     });
 
     const AddEl = make('div', this.CSS.columnActionIcon, {
@@ -284,7 +292,8 @@ export default class UI {
     this.api.tooltip.onHover(DeleteEl, '删除当前列', { delay: 1500 });
     this.api.tooltip.onHover(AlignCenterEl, '对齐方式', { delay: 1500 });
 
-    WrapperEl.appendChild(DragEl);
+    WrapperEl.appendChild(MoveLeftEl);
+    WrapperEl.appendChild(MoveRightEl);
     WrapperEl.appendChild(AlignCenterEl);
     WrapperEl.appendChild(AddEl);
     WrapperEl.appendChild(DeleteEl);
@@ -302,8 +311,12 @@ export default class UI {
       'data-row-index': this._whichRow(item.index)
     });
 
-    const DragEl = make('div', this.CSS.rowActionIcon, {
-      innerHTML: DragIcon
+    const MoveUpEl = make('div', this.CSS.columnActionIcon, {
+      innerHTML: MoveUpIcon
+    });
+
+    const MoveDownEl = make('div', this.CSS.columnActionIcon, {
+      innerHTML: MoveDownIcon
     });
 
     const AddEl = make('div', this.CSS.rowActionIcon, {
@@ -327,7 +340,8 @@ export default class UI {
       placement: 'right'
     });
 
-    WrapperEl.appendChild(DragEl);
+    WrapperEl.appendChild(MoveUpEl);
+    WrapperEl.appendChild(MoveDownEl);
     WrapperEl.appendChild(AddEl);
     WrapperEl.appendChild(DeleteEl);
 
