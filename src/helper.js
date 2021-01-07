@@ -1,21 +1,43 @@
 import { splitEvery, flatten, insert, remove } from "ramda";
 
 /**
- * map index for data.items
+ * @typedef {Object} TableData
+ * @description Table Tool's  data format
+ * @property {number} columnCount — column count
+ * @property {[CellItem]} items - array of cell item
+ */
+
+/**
+ * @typedef {Object} CellItem
+ * @description cell item
+ * @property {string} text - inner text in cell (td)
+ * @property {string} align — left | center | right
+ */
+
+/**
+ * map index for data.items, fill empty cells if needed
  *
- * @param {TODO} data
+ * @param {TableData} data
  */
 export const mapIndex = (data) => {
-  const items = data.items.map((item, index) => {
-    return {
-      ...item,
-      index,
-    };
-  });
+  const { columnCount, items } = data;
+  const missingCount =
+    columnCount * Math.ceil(items.length / columnCount) - items.length;
+
+  let newItems = data.items;
+
+  if (missingCount > 0) {
+    for (let i = 0; i < missingCount; i++) {
+      newItems.push({ text: "" });
+    }
+  }
 
   return {
     ...data,
-    items,
+    items: newItems.map((item, index) => ({
+      ...item,
+      index,
+    })),
   };
 };
 
@@ -23,29 +45,49 @@ export const mapIndex = (data) => {
  * add a column to current data
  *
  */
-export const addColumn = (items, columnIndex) => {
-  console.log("add Column: ", items);
-  console.log("add Column columnIndex: ", columnIndex);
+export const addColumn = (data, columnIndex) => {
+  const { columnCount } = data;
+
+  const columnTanks = _buildColumnTanks(data);
+  const rowLength = columnTanks[0].length;
+
+  const columnArrayAdded = insert(
+    columnIndex + 1,
+    _getHolderCells(rowLength),
+    columnTanks
+  );
+
+  const regularRows = _covertToRegularRows(columnArrayAdded, columnTanks);
+
+  return {
+    ...data,
+    columnCount: columnCount + 1,
+    items: regularRows,
+  };
 };
 
 /**
- * get holder cells holder
- * @param {Number} count
- * @returns {[TODO]}
- * @private
+ * add a column to current data
+ *
  */
-const _getHolderCells = (count) => {
-  const ret = [];
+export const deleteColumn = (data, columnIndex) => {
+  const { columnCount } = data;
 
-  for (let i = 0; i < count; i++) {
-    ret.push({ text: "" });
-  }
+  const columnTanks = _buildColumnTanks(data);
+  const columnArrayRemoved = remove(columnIndex, 1, columnTanks);
+  const regularRows = _covertToRegularRows(columnArrayRemoved, columnTanks);
 
-  return ret;
+  return {
+    ...data,
+    columnCount: columnCount - 1,
+    items: regularRows,
+  };
 };
 
 /**
  * add a row to current data
+ * @param {TableData} data
+ * @param {number} rowIndex
  *
  */
 export const addRow = (data, rowIndex) => {
@@ -53,9 +95,6 @@ export const addRow = (data, rowIndex) => {
 
   const rows = splitEvery(columnCount, items);
   const rowsAdded = insert(rowIndex + 1, _getHolderCells(columnCount), rows);
-
-  console.log("rows: ", rows);
-  console.log("rows added: ", flatten(rowsAdded));
 
   return {
     ...data,
@@ -65,7 +104,8 @@ export const addRow = (data, rowIndex) => {
 
 /**
  * delete a row
- *
+ * @param {TableData} data
+ * @param {number} rowIndex
  */
 export const deleteRow = (data, rowIndex) => {
   const { columnCount, items } = data;
@@ -73,21 +113,16 @@ export const deleteRow = (data, rowIndex) => {
   const rows = splitEvery(columnCount, items);
   const rowsRemoved = remove(rowIndex, 1, rows);
 
-  console.log("rows: ", rows);
-  console.log("rows deleted: ", flatten(rowsRemoved));
-
   return {
     ...data,
     items: flatten(rowsRemoved),
   };
 };
 
-export const deleteColumn = () => {};
-
 /**
  * judge column by given index
  * @param {Number} index
- * @param {data} TODO:
+ * @param {TableData} data
  * @return {Number}
  * @memberof UI
  */
@@ -100,7 +135,7 @@ export const whichColumn = (index, data) => {
 /**
  * judge row by given index
  * @param {Number} index
- * @return {Number} TODO:
+ * @param {TableData} data
  * @memberof UI
  */
 export const whichRow = (index, data) => {
@@ -139,4 +174,67 @@ export const hideAllEls = (elements) => {
 
     el.style.display = "none";
   }
+};
+
+/**
+ * get holder cells holder
+ * @param {Number} count
+ * @returns {[CellItem]}
+ * @private
+ */
+const _getHolderCells = (count) => {
+  const ret = [];
+
+  for (let i = 0; i < count; i++) {
+    ret.push({ text: "" });
+  }
+
+  return ret;
+};
+
+/**
+ * build tanks structure for each column
+ *
+ * @param {TableData} data
+ * @returns
+ * @private
+ */
+const _buildColumnTanks = (data) => {
+  const { columnCount, items } = data;
+
+  const columnTanks = [];
+
+  for (let i = 0; i < columnCount; i++) {
+    columnTanks.push([]);
+  }
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+
+    const itemColumnIndex = whichColumn(item.index, data);
+
+    columnTanks[itemColumnIndex].push(item);
+  }
+
+  return columnTanks;
+};
+
+/**
+ * covert nested tank-structure columns to regular rows
+ * @param {[[CellItem]]} columnArray
+ * @param {[[CellItem]]} tanksColumnArray
+ * @returns
+ * @private
+ */
+const _covertToRegularRows = (columnArray, tanksColumnArray) => {
+  const rowLength = tanksColumnArray[0].length;
+  const regularRows = [];
+
+  for (let i = 0; i < rowLength; i++) {
+    for (let j = 0; j < columnArray.length; j++) {
+      regularRows.push(columnArray[j][i]);
+    }
+  }
+
+  return regularRows;
 };

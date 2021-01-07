@@ -77,12 +77,10 @@ export default class Table {
     this._data = {
       // 斑马线?
       // 有表头？
-      // rowCount: 2
-      columnCount: 3,
+      columnCount: 4,
       items: [
         {
-          text: 'cell 00'
-          // align: '..',
+          text: 'cell 0'
         },
         {
           text: 'cell 1'
