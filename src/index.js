@@ -18,11 +18,8 @@ import { make } from "@groupher/editor-utils";
 
 import './index.css';
 import TableIcon from './svg/table.svg';
-import UnderlineIcon from './svg/underline.svg';
-import CardIcon from './svg/card.svg';
-import EditIcon from './svg/edit.svg';
 
-import Ui from './ui';
+import UI from './ui';
 
 // eslint-disable-next-line
 import polyfill from "url-polyfill";
@@ -78,18 +75,46 @@ export default class Table {
     this.element = null;
 
     this._data = {
-      link: '',
-      meta: {}
+      // 斑马线?
+      // 有表头？
+      // rowCount: 2
+      columnCount: 3,
+      items: [
+        {
+          text: 'cell 00'
+          // align: '..',
+        },
+        {
+          text: 'cell 1'
+        },
+        {
+          text: 'cell 2'
+        },
+        {
+          text: 'cell 3'
+        },
+        {
+          text: 'cell 4'
+        },
+        {
+          text: 'cell 5'
+        },
+        {
+          text: 'cell 6'
+        },
+        {
+          text: 'cell 7'
+        },
+        {
+          text: 'cell 8'
+        }
+      ]
     };
 
-    this.data = data;
-
-    this.ui = new Ui({
+    this.ui = new UI({
       api,
       config: this.config,
-      data: this.data
-      // setTune: this.setTune.bind(this),
-      // setData: this.setData.bind(this),
+      reRender: this.reRender.bind(this)
     });
   }
 
@@ -100,9 +125,20 @@ export default class Table {
    * @return {HTMLDivElement}
    */
   render() {
-    this.element = this.ui.drawView();
+    this.element = this.ui.drawView(this._data);
 
     return this.element;
+  }
+
+  /**
+   * reRender based on new data
+   * @public
+   *
+   * @return {HTMLDivElement}
+   */
+  reRender(data) {
+    this._data = data;
+    this.replaceElement(this.ui.drawView(this._data));
   }
 
   /**
@@ -124,32 +160,24 @@ export default class Table {
   renderSettings() {
     const Wrapper = make('div', [ this.CSS.settingsWrapper ], {});
 
-    const settings = [
-      {
-        title: '普通链接',
-        icon: UnderlineIcon
-      },
-      {
-        title: '卡片链接',
-        icon: CardIcon
-      },
-      {
-        title: '编辑链接',
-        icon: EditIcon
-      }
-    ];
+    // const settings = [
+    //   {
+    //     title: "编辑链接",
+    //     icon: EditIcon,
+    //   },
+    // ];
 
-    settings.forEach((item) => {
-      const itemEl = make('div', this.CSS.settingsButton, {
-        innerHTML: item.icon
-      });
+    // settings.forEach((item) => {
+    //   const itemEl = make("div", this.CSS.settingsButton, {
+    //     innerHTML: item.icon,
+    //   });
 
-      this.api.tooltip.onHover(itemEl, item.title, {
-        placement: 'top'
-      });
+    //   this.api.tooltip.onHover(itemEl, item.title, {
+    //     placement: "top",
+    //   });
 
-      Wrapper.appendChild(itemEl);
-    });
+    //   Wrapper.appendChild(itemEl);
+    // });
 
     return Wrapper;
   }
@@ -161,22 +189,22 @@ export default class Table {
    * @return {TableData}
    */
   save() {
-    return this.data;
+    return this._data;
   }
 
   /**
    * Stores all Tool's data
    * @param {TableData} data
    */
-  set data(data) {
-    this._data = Object.assign(
-      {},
-      {
-        link: data.link || this._data.link,
-        meta: data.meta || this._data.meta
-      }
-    );
-  }
+  // set data(data) {
+  // this._data = Object.assign(
+  //   {},
+  //   {
+  //     link: data.link || this._data.link,
+  //     meta: data.meta || this._data.meta,
+  //   }
+  // );
+  // }
 
   /**
    * Return Tool data
@@ -193,24 +221,6 @@ export default class Table {
   get CSS() {
     return {
       baseClass: this.api.styles.block,
-      input: this.api.styles.input,
-
-      /**
-       * Tool's classes
-       */
-      container: 'link-tool',
-      inputEl: 'link-tool__input',
-      inputHolder: 'link-tool__input-holder',
-      inputError: 'link-tool__input-holder--error',
-      linkContent: 'link-tool__content',
-      linkContentRendered: 'link-tool__content--rendered',
-      linkImage: 'link-tool__image',
-      linkTitle: 'link-tool__title',
-      linkDescription: 'link-tool__description',
-      linkText: 'link-tool__anchor',
-      progress: 'link-tool__progress',
-      progressLoading: 'link-tool__progress--loading',
-      progressLoaded: 'link-tool__progress--loaded',
 
       // buttons
       settingsWrapper: 'cdx-custom-settings',
