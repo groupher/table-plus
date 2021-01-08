@@ -20,7 +20,7 @@ import { splitEvery, flatten, insert, remove } from 'ramda';
  *
  * @param {TableData} data
  */
-export const mapIndex = (data) => {
+export const formatData = (data) => {
   const { columnCount, items } = data;
   const missingCount =
     columnCount * Math.ceil(items.length / columnCount) - items.length;
@@ -37,6 +37,7 @@ export const mapIndex = (data) => {
     ...data,
     items: newItems.map((item, index) => ({
       ...item,
+      align: !item.align || item.align === '' ? 'left' : item.align,
       index
     }))
   };

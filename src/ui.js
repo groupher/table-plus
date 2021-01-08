@@ -23,7 +23,7 @@ import AlignLeftIcon from './svg/align-left.svg';
 import AlignRightIcon from './svg/align-right.svg';
 
 import {
-  mapIndex,
+  formatData,
   addColumn,
   deleteColumn,
   moveColumn,
@@ -91,6 +91,8 @@ export default class UI {
       container: 'cdx-table-wrapper',
       table: 'cdx-table',
       cell: 'cdx-table__cell',
+      // not for directly use
+      _cellAlign: 'cdx-table__cell_align_',
       columnHandler: 'cdx-table__column_handler',
       columnActions: 'cdx-table__column_actions',
       columnActionIcon: 'cdx-table__column_action_icon',
@@ -112,7 +114,7 @@ export default class UI {
    * draw render View
    */
   drawView(data) {
-    this._data = mapIndex(data);
+    this._data = formatData(data);
     const wrapperEl = make('div', this.CSS.baseClass);
     const containerEl = make('div', this.CSS.container);
 
@@ -200,13 +202,17 @@ export default class UI {
    */
   _drawCell(item) {
     const TdEl = make('td');
-    const CellEl = make('div', this.CSS.cell, {
-      innerHTML: item.text,
-      contentEditable: true,
-      'data-index': item.index,
-      'data-row-index': whichRow(item.index, this._data),
-      'data-column-index': whichColumn(item.index, this._data)
-    });
+    const CellEl = make(
+      'div',
+      [this.CSS.cell, `${this.CSS._cellAlign}${item.align}`],
+      {
+        innerHTML: item.text,
+        contentEditable: true,
+        'data-index': item.index,
+        'data-row-index': whichRow(item.index, this._data),
+        'data-column-index': whichColumn(item.index, this._data)
+      }
+    );
 
     TdEl.appendChild(CellEl);
 
@@ -260,21 +266,13 @@ export default class UI {
       `.${this.CSS.cell}[data-column-index="${columnIndex}"]`
     );
 
-    console.log('cellEls: ', cellEls);
-
-    let NextAlignIcon;
     let nextAlign;
 
     if (AlignEl.dataset.align === 'left') {
-      NextAlignIcon = AlignCenterIcon;
       nextAlign = 'center';
-      AlignEl.setAttribute('data-align', 'center');
     } else if (AlignEl.dataset.align === 'center') {
-      NextAlignIcon = AlignRightIcon;
       nextAlign = 'right';
-      AlignEl.setAttribute('data-align', 'right');
     } else if (AlignEl.dataset.align === 'right') {
-      NextAlignIcon = AlignLeftIcon;
       nextAlign = 'left';
     }
 
@@ -282,8 +280,28 @@ export default class UI {
       setAlignClass(cellEls, nextAlign);
       this._data = setAlignData(columnIndex, nextAlign, this._data);
       AlignEl.setAttribute('data-align', nextAlign);
-      AlignEl.innerHTML = NextAlignIcon;
+      AlignEl.innerHTML = this._getAlignIcon(nextAlign);
     });
+  }
+
+  /**
+   *
+   * @param {String} align - left | center | right
+   * @returns {String} svg format
+   * @memberof UI
+   */
+  _getAlignIcon(align) {
+    switch (align) {
+      case 'center': {
+        return AlignCenterIcon;
+      }
+      case 'right': {
+        return AlignRightIcon;
+      }
+      default: {
+        return AlignLeftIcon;
+      }
+    }
   }
 
   /**
@@ -315,9 +333,9 @@ export default class UI {
     });
 
     const AlignEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: AlignLeftIcon,
+      innerHTML: this._getAlignIcon(item.align),
       'data-action': 'align',
-      'data-align': 'left'
+      'data-align': item.align
     });
 
     AlignEl.addEventListener('click', (e) => {
@@ -350,7 +368,7 @@ export default class UI {
 
     this.api.tooltip.onHover(AddEl, '增加一列', { delay: 1500 });
     this.api.tooltip.onHover(DeleteEl, '删除当前列', { delay: 1500 });
-    this.api.tooltip.onHover(AlignEl, '对齐方式', { delay: 1500 });
+    this.api.tooltip.onHover(AlignEl, '对齐方式', { delay: 200 });
 
     WrapperEl.appendChild(MoveLeftEl);
     WrapperEl.appendChild(MoveRightEl);

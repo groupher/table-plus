@@ -83,7 +83,8 @@ export default class Table {
           text: 'cell 0'
         },
         {
-          text: 'cell 1'
+          text: 'cell 1',
+          align: 'center'
         },
         {
           text: 'cell 2'
@@ -95,7 +96,8 @@ export default class Table {
           text: 'cell 4'
         },
         {
-          text: 'cell 5'
+          text: 'cell 5',
+          align: 'center'
         },
         {
           text: 'cell 6'
