@@ -581,9 +581,9 @@
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/@codexteam/ajax/-/ajax-3.2.1.tgz#7b22dc1c2e84e57e8c18f21232d3bee8ec7c31bb"
 
-"@groupher/editor-utils@^0.1.71":
-  version "0.1.71"
-  resolved "https://registry.npm.taobao.org/@groupher/editor-utils/download/@groupher/editor-utils-0.1.71.tgz#41a1bfba3860262da6e188c41c9d344d42baa5cb"
+"@groupher/editor-utils@0.1.85":
+  version "0.1.85"
+  resolved "https://registry.npm.taobao.org/@groupher/editor-utils/download/@groupher/editor-utils-0.1.85.tgz#ca2e388817d9ac24d1291e40e89dd00aa0092dc7"
   dependencies:
     debug "^4.1.1"
     pubsub-js "^1.8.0"

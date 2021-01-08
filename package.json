@@ -47,7 +47,7 @@
   "homepage": "https://github.com/editor-js/link#readme",
   "dependencies": {
     "@babel/runtime": "^7.3.1",
-    "@groupher/editor-utils": "^0.1.71",
+    "@groupher/editor-utils": "0.1.85",
     "ramda": "^0.27.1"
   }
 }

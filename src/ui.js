@@ -2,7 +2,13 @@
 import ajax from "@codexteam/ajax";
 // eslint-disable-next-line
 import polyfill from "url-polyfill";
-import { make, findIndex, clazz } from '@groupher/editor-utils';
+import {
+  make,
+  findIndex,
+  clazz,
+  showElement,
+  hideElements
+} from '@groupher/editor-utils';
 
 import MoveLeftIcon from './svg/move-left.svg';
 import MoveRightIcon from './svg/move-right.svg';
@@ -18,10 +24,10 @@ import {
   mapIndex,
   addColumn,
   deleteColumn,
+  moveColumn,
   addRow,
   deleteRow,
-  showEl,
-  hideAllEls,
+  moveRow,
   whichColumn,
   whichRow
 } from './helper';
@@ -264,6 +270,18 @@ export default class UI {
       innerHTML: AlignCenterIcon
     });
 
+    MoveLeftEl.addEventListener('click', (e) => {
+      const newData = moveColumn(this.data, columnIndex, 'left');
+
+      this.redraw(newData);
+    });
+
+    MoveRightEl.addEventListener('click', (e) => {
+      const newData = moveColumn(this.data, columnIndex, 'right');
+
+      this.redraw(newData);
+    });
+
     DeleteEl.addEventListener('click', (e) => {
       const newData = deleteColumn(this.data, columnIndex);
 
@@ -315,6 +333,18 @@ export default class UI {
 
     const DeleteEl = make('div', this.CSS.rowActionIcon, {
       innerHTML: DeleteIcon
+    });
+
+    MoveUpEl.addEventListener('click', (e) => {
+      const newData = moveRow(this.data, rowIndex, 'up');
+
+      this.redraw(newData);
+    });
+
+    MoveDownEl.addEventListener('click', (e) => {
+      const newData = moveRow(this.data, rowIndex, 'down');
+
+      this.redraw(newData);
     });
 
     AddEl.addEventListener('click', (e) => {
@@ -397,7 +427,7 @@ export default class UI {
       return parseInt(item.dataset.columnIndex) === columnIndex;
     });
 
-    showEl(targetIndex, handlerEls, 'flex');
+    showElement(targetIndex, handlerEls, 'flex');
   }
 
   /**
@@ -413,7 +443,7 @@ export default class UI {
       return parseInt(item.dataset.rowIndex) === rowIndex;
     });
 
-    showEl(targetIndex, handlerEls, 'flex');
+    showElement(targetIndex, handlerEls, 'flex');
   }
 
   /**
@@ -429,7 +459,7 @@ export default class UI {
       return parseInt(item.dataset.columnIndex) === columnIndex;
     });
 
-    showEl(targetIndex, handlerEls);
+    showElement(targetIndex, handlerEls);
 
     return targetIndex;
   }
@@ -448,7 +478,7 @@ export default class UI {
       return parseInt(item.dataset.rowIndex) === rowIndex;
     });
 
-    showEl(targetIndex, handlerEls);
+    showElement(targetIndex, handlerEls);
 
     return targetIndex;
   }
@@ -543,7 +573,7 @@ export default class UI {
    * @memberof UI
    */
   _hideAllHandlers() {
-    hideAllEls([...this.columnHandlers, ...this.rowHandlers]);
+    hideElements([...this.columnHandlers, ...this.rowHandlers]);
   }
 
   /**
@@ -552,6 +582,6 @@ export default class UI {
    * @memberof UI
    */
   _hideAllActions() {
-    hideAllEls([...this.columnActions, ...this.rowActions]);
+    hideElements([...this.columnActions, ...this.rowActions]);
   }
 }

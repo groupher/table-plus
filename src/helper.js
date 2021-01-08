@@ -1,4 +1,5 @@
-import { splitEvery, flatten, insert, remove } from "ramda";
+import { insertAndShift } from '@groupher/editor-utils';
+import { splitEvery, flatten, insert, remove } from 'ramda';
 
 /**
  * @typedef {Object} TableData
@@ -28,7 +29,7 @@ export const mapIndex = (data) => {
 
   if (missingCount > 0) {
     for (let i = 0; i < missingCount; i++) {
-      newItems.push({ text: "" });
+      newItems.push({ text: '' });
     }
   }
 
@@ -36,14 +37,16 @@ export const mapIndex = (data) => {
     ...data,
     items: newItems.map((item, index) => ({
       ...item,
-      index,
-    })),
+      index
+    }))
   };
 };
 
 /**
  * add a column to current data
- *
+ * @param {TableData} data
+ * @param {number} columnIndex
+ * @return {TableData}
  */
 export const addColumn = (data, columnIndex) => {
   const { columnCount } = data;
@@ -62,13 +65,15 @@ export const addColumn = (data, columnIndex) => {
   return {
     ...data,
     columnCount: columnCount + 1,
-    items: regularRows,
+    items: regularRows
   };
 };
 
 /**
  * add a column to current data
- *
+ * @param {TableData} data
+ * @param {number} columnIndex
+ * @return {TableData}
  */
 export const deleteColumn = (data, columnIndex) => {
   const { columnCount } = data;
@@ -80,7 +85,36 @@ export const deleteColumn = (data, columnIndex) => {
   return {
     ...data,
     columnCount: columnCount - 1,
-    items: regularRows,
+    items: regularRows
+  };
+};
+
+/**
+ * @param {TableData} data
+ * @param {number} columnIndex
+ * @param {string} direction - left | right
+ * @return {TableData}
+ */
+export const moveColumn = (data, columnIndex, direction = 'left') => {
+  const columnTanks = _buildColumnTanks(data);
+
+  let swapColumnIndex;
+
+  if (direction === 'left') {
+    swapColumnIndex =
+      columnIndex - 1 < 0 ? columnTanks.length - 1 : columnIndex - 1;
+  } else {
+    swapColumnIndex =
+      columnIndex + 1 > columnTanks.length - 1 ? 0 : columnIndex + 1;
+  }
+
+  insertAndShift(columnTanks, columnIndex, swapColumnIndex);
+
+  const regularRows = _covertToRegularRows(columnTanks, columnTanks);
+
+  return {
+    ...data,
+    items: regularRows
   };
 };
 
@@ -88,7 +122,7 @@ export const deleteColumn = (data, columnIndex) => {
  * add a row to current data
  * @param {TableData} data
  * @param {number} rowIndex
- *
+ * @return {TableData}
  */
 export const addRow = (data, rowIndex) => {
   const { columnCount, items } = data;
@@ -98,7 +132,7 @@ export const addRow = (data, rowIndex) => {
 
   return {
     ...data,
-    items: flatten(rowsAdded),
+    items: flatten(rowsAdded)
   };
 };
 
@@ -106,6 +140,7 @@ export const addRow = (data, rowIndex) => {
  * delete a row
  * @param {TableData} data
  * @param {number} rowIndex
+ * @return {TableData}
  */
 export const deleteRow = (data, rowIndex) => {
   const { columnCount, items } = data;
@@ -115,7 +150,33 @@ export const deleteRow = (data, rowIndex) => {
 
   return {
     ...data,
-    items: flatten(rowsRemoved),
+    items: flatten(rowsRemoved)
+  };
+};
+
+/**
+ * @param {TableData} data
+ * @param {number} rowIndex
+ * @param {string} direction - up | down
+ * @return {TableData}
+ */
+export const moveRow = (data, rowIndex, direction = 'up') => {
+  const { columnCount, items } = data;
+  const rows = splitEvery(columnCount, items);
+
+  let swapRowIndex;
+
+  if (direction === 'up') {
+    swapRowIndex = rowIndex - 1 < 0 ? rows.length - 1 : rowIndex - 1;
+  } else {
+    swapRowIndex = rowIndex + 1 > rows.length - 1 ? 0 : rowIndex + 1;
+  }
+
+  insertAndShift(rows, rowIndex, swapRowIndex);
+
+  return {
+    ...data,
+    items: flatten(rows)
   };
 };
 
@@ -124,7 +185,6 @@ export const deleteRow = (data, rowIndex) => {
  * @param {Number} index
  * @param {TableData} data
  * @return {Number}
- * @memberof UI
  */
 export const whichColumn = (index, data) => {
   const { columnCount } = data;
@@ -136,44 +196,12 @@ export const whichColumn = (index, data) => {
  * judge row by given index
  * @param {Number} index
  * @param {TableData} data
- * @memberof UI
+ * @return {Number}
  */
 export const whichRow = (index, data) => {
   const { columnCount } = data;
 
   return Math.floor(parseInt(index) / columnCount);
-};
-
-/**
- *
- *
- * @param {Number} index
- * @param {[HTMLElement]} items
- * @attr {string} display style: block | flex
- */
-export const showEl = (index, items, attr = "block") => {
-  if (index >= 0) {
-    for (let i = 0; i < items.length; i += 1) {
-      const el = items[i];
-
-      el.style.display = "none";
-    }
-    setTimeout(() => {
-      items[index].style.display = attr;
-    });
-  }
-};
-
-/**
- * hide all elements
- * @param {[HTMLElement]} elements
- */
-export const hideAllEls = (elements) => {
-  for (let i = 0; i < elements.length; i += 1) {
-    const el = elements[i];
-
-    el.style.display = "none";
-  }
 };
 
 /**
@@ -186,7 +214,7 @@ const _getHolderCells = (count) => {
   const ret = [];
 
   for (let i = 0; i < count; i++) {
-    ret.push({ text: "" });
+    ret.push({ text: '' });
   }
 
   return ret;
