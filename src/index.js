@@ -147,8 +147,10 @@ export default class Table {
         innerHTML: item.icon
       });
 
-      if (item.action === SETTING.TOGGLE_HEADER && this._data.withHeader) {
-        ItemEl.classList.add(this.CSS.settingsButtonActive);
+      if (item.action === SETTING.TOGGLE_HEADER) {
+        this._data.withHeader
+          ? ItemEl.classList.add(this.CSS.settingsButtonActive)
+          : ItemEl.classList.remove(this.CSS.settingsButtonActive);
       }
 
       ItemEl.addEventListener('click', () => {

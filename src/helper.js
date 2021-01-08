@@ -87,7 +87,7 @@ export const deleteHeader = (data) => {
 
   return {
     ...data,
-    isHeader: false,
+    withHeader: false,
     items: flatten(rowsRemoved)
   };
 };
