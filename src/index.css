@@ -43,6 +43,10 @@
     border-bottom: 2px solid #dbdbe2 !important;
   }
 
+  &__td_stripe {
+    background: #f7f7f7;
+  }
+
   &__zebra_row {
     background: #f9f9f9;
   }

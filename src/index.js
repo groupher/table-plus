@@ -153,6 +153,12 @@ export default class Table {
           : ItemEl.classList.remove(this.CSS.settingsButtonActive);
       }
 
+      if (item.action === SETTING.TOGGLE_ZEBRA) {
+        this._data.withZebraStripe
+          ? ItemEl.classList.add(this.CSS.settingsButtonActive)
+          : ItemEl.classList.remove(this.CSS.settingsButtonActive);
+      }
+
       ItemEl.addEventListener('click', () => {
         this.ui.handleSettingAction(item.action);
       });

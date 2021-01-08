@@ -30,6 +30,8 @@ import {
   deleteHeader,
   addColumn,
   deleteColumn,
+  addZebraStripe,
+  deleteZebraStripe,
   moveColumn,
   addRow,
   deleteRow,
@@ -110,6 +112,7 @@ export default class UI {
       table: 'cdx-table',
       header: 'cdx-table__header',
       cell: 'cdx-table__cell',
+      stripe: 'cdx-table__td_stripe',
       // not for directly use
       _cellAlign: 'cdx-table__cell_align_',
       columnHandler: 'cdx-table__column_handler',
@@ -191,7 +194,16 @@ export default class UI {
    */
   handleSettingAction(action) {
     if (action === SETTING.TOGGLE_HEADER) {
-      this._data.withHeader ? this.removeTableHeader() : this.addTableHeader();
+      this._data.withHeader
+        ? this._deleteTableHeader()
+        : this._addTableHeader();
+      return;
+    }
+
+    if (action === SETTING.TOGGLE_ZEBRA) {
+      this._data.withZebraStripe
+        ? this._deleteZebraStripe()
+        : this._addZebraStripe();
     }
   }
 
@@ -200,7 +212,7 @@ export default class UI {
    *
    * @memberof UI
    */
-  addTableHeader() {
+  _addTableHeader() {
     const newData = addHeader(this._data);
 
     this.redraw(newData);
@@ -211,8 +223,30 @@ export default class UI {
    *
    * @memberof UI
    */
-  removeTableHeader() {
+  _deleteTableHeader() {
     const newData = deleteHeader(this._data);
+
+    this.redraw(newData);
+  }
+
+  /**
+   * add header to table
+   *
+   * @memberof UI
+   */
+  _addZebraStripe() {
+    const newData = addZebraStripe(this._data);
+
+    this.redraw(newData);
+  }
+
+  /**
+   * remove table header
+   *
+   * @memberof UI
+   */
+  _deleteZebraStripe() {
+    const newData = deleteZebraStripe(this._data);
 
     this.redraw(newData);
   }
@@ -268,10 +302,11 @@ export default class UI {
     // const headerClass = item.isHeader ? this.CSS.header : "";
     // const TdEl = make('td', headerClass);
 
-    const WrapperEl = item.isHeader ? make('th', this.CSS.header) : make('td');
+    const stripClass = item.isZebraStripe ? this.CSS.stripe : '';
 
-    // item.zebraBg
-    // this.CSS.rowZebra
+    const WrapperEl = item.isHeader
+      ? make('th', this.CSS.header)
+      : make('td', stripClass);
 
     const CellEl = make(
       'div',

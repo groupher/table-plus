@@ -14,6 +14,7 @@ import { splitEvery, flatten, insert, remove } from 'ramda';
  * @property {string} text - inner text in cell (td)
  * @property {string} align — left | center | right
  * @property {boolean} isHeader
+ * @property {boolean} isZebraStripe
  */
 
 /**
@@ -40,6 +41,7 @@ export const formatData = (data) => {
     items: newItems.map((item, index) => ({
       ...item,
       align: !item.align || item.align === '' ? 'left' : item.align,
+      isZebraStripe: !!item.isZebraStripe,
       index
     }))
   };
@@ -93,6 +95,61 @@ export const deleteHeader = (data) => {
 };
 
 /**
+ * add zebra sign in table tools data
+ *
+ * @param {TableData} data
+ * @return {TableData}
+ */
+export const addZebraStripe = (data) => {
+  const { columnCount, items } = data;
+
+  const rows = splitEvery(columnCount, items);
+
+  const RowFormatted = rows.map((rowItem, index) => {
+    const stripeIndex = data.withHeader ? index + 1 : index;
+
+    let isZebraStripeRow = stripeIndex % 2 !== 0;
+
+    // if has table header, do not stripe it
+    if (data.withHeader && index === 0) {
+      isZebraStripeRow = false;
+    }
+    rowItem.forEach((item) => (item.isZebraStripe = isZebraStripeRow));
+
+    return [ ...rowItem ];
+  });
+
+  return {
+    ...data,
+    withZebraStripe: true,
+    items: flatten(RowFormatted)
+  };
+};
+
+/**
+ * delete zebra sign in table tools data
+ *
+ * @param {TableData} data
+ * @return {TableData}
+ */
+export const deleteZebraStripe = (data) => {
+  const { columnCount, items } = data;
+
+  const rows = splitEvery(columnCount, items);
+
+  const RowFormatted = rows.map((rowItem, index) => {
+    rowItem.forEach((item) => (item.isZebraStripe = false));
+    return [ ...rowItem ];
+  });
+
+  return {
+    ...data,
+    withZebraStripe: false,
+    items: flatten(RowFormatted)
+  };
+};
+
+/**
  * add a column to current data
  * @param {TableData} data
  * @param {number} columnIndex
@@ -140,35 +197,6 @@ export const deleteColumn = (data, columnIndex) => {
 };
 
 /**
- * @param {TableData} data
- * @param {number} columnIndex
- * @param {string} direction - left | right
- * @return {TableData}
- */
-export const moveColumn = (data, columnIndex, direction = 'left') => {
-  const columnTanks = _buildColumnTanks(data);
-
-  let swapColumnIndex;
-
-  if (direction === 'left') {
-    swapColumnIndex =
-      columnIndex - 1 < 0 ? columnTanks.length - 1 : columnIndex - 1;
-  } else {
-    swapColumnIndex =
-      columnIndex + 1 > columnTanks.length - 1 ? 0 : columnIndex + 1;
-  }
-
-  insertAndShift(columnTanks, columnIndex, swapColumnIndex);
-
-  const regularRows = _covertToRegularRows(columnTanks, columnTanks);
-
-  return {
-    ...data,
-    items: regularRows
-  };
-};
-
-/**
  * add a row to current data
  * @param {TableData} data
  * @param {number} rowIndex
@@ -201,6 +229,35 @@ export const deleteRow = (data, rowIndex) => {
   return {
     ...data,
     items: flatten(rowsRemoved)
+  };
+};
+
+/**
+ * @param {TableData} data
+ * @param {number} columnIndex
+ * @param {string} direction - left | right
+ * @return {TableData}
+ */
+export const moveColumn = (data, columnIndex, direction = 'left') => {
+  const columnTanks = _buildColumnTanks(data);
+
+  let swapColumnIndex;
+
+  if (direction === 'left') {
+    swapColumnIndex =
+      columnIndex - 1 < 0 ? columnTanks.length - 1 : columnIndex - 1;
+  } else {
+    swapColumnIndex =
+      columnIndex + 1 > columnTanks.length - 1 ? 0 : columnIndex + 1;
+  }
+
+  insertAndShift(columnTanks, columnIndex, swapColumnIndex);
+
+  const regularRows = _covertToRegularRows(columnTanks, columnTanks);
+
+  return {
+    ...data,
+    items: regularRows
   };
 };
 
