@@ -10,6 +10,8 @@ import {
   hideElements
 } from '@groupher/editor-utils';
 
+import { SETTING } from './constant';
+
 import MoveLeftIcon from './svg/move-left.svg';
 import MoveRightIcon from './svg/move-right.svg';
 import MoveUpIcon from './svg/move-up.svg';
@@ -25,6 +27,7 @@ import AlignRightIcon from './svg/align-right.svg';
 import {
   formatData,
   addHeader,
+  deleteHeader,
   addColumn,
   deleteColumn,
   moveColumn,
@@ -168,6 +171,7 @@ export default class UI {
    * @memberof UI
    */
   redraw(data) {
+    this._data = data;
     this.activeColumnIndex = null;
     this.activeRowIndex = null;
     this.columnHandlers = [];
@@ -180,14 +184,35 @@ export default class UI {
   }
 
   /**
-   * add header to tabl
+   * handle setting action
+   *
+   * @param {String} action - value of SETTING
+   * @memberof UI
+   */
+  handleSettingAction(action) {
+    if (action === SETTING.TOGGLE_HEADER) {
+      this._data.withHeader ? this.removeTableHeader() : this.addTableHeader();
+    }
+  }
+
+  /**
+   * add header to table
    *
    * @memberof UI
    */
   addTableHeader() {
     const newData = addHeader(this._data);
 
-    console.log('newData: ', newData);
+    this.redraw(newData);
+  }
+
+  /**
+   * remove table header
+   *
+   * @memberof UI
+   */
+  removeTableHeader() {
+    const newData = deleteHeader(this._data);
 
     this.redraw(newData);
   }

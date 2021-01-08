@@ -46,7 +46,7 @@ export const formatData = (data) => {
 };
 
 /**
- * map index for data.items, fill empty cells if needed
+ * add header to table tools data
  *
  * @param {TableData} data
  * @return {TableData}
@@ -68,7 +68,27 @@ export const addHeader = (data) => {
 
   return {
     ...data,
+    withHeader: true,
     items: flatten(rowsAdded)
+  };
+};
+
+/**
+ * remove header to table tools data
+ *
+ * @param {TableData} data
+ * @return {TableData}
+ */
+export const deleteHeader = (data) => {
+  const { columnCount, items } = data;
+
+  const rows = splitEvery(columnCount, items);
+  const rowsRemoved = remove(0, 1, rows);
+
+  return {
+    ...data,
+    isHeader: false,
+    items: flatten(rowsRemoved)
   };
 };
 

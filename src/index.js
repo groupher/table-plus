@@ -18,6 +18,8 @@ import { make } from "@groupher/editor-utils";
 
 import './index.css';
 
+import { SETTING } from './constant';
+
 import TableIcon from './svg/table.svg';
 import TableHeaderIcon from './svg/table-header.svg';
 import TableZebraIcon from './svg/table-zebra.svg';
@@ -130,10 +132,12 @@ export default class Table {
     const settings = [
       {
         title: '添加表头',
+        action: SETTING.TOGGLE_HEADER,
         icon: TableHeaderIcon
       },
       {
         title: '斑马条纹',
+        action: SETTING.TOGGLE_ZEBRA,
         icon: TableZebraIcon
       }
     ];
@@ -143,9 +147,12 @@ export default class Table {
         innerHTML: item.icon
       });
 
+      if (item.action === SETTING.TOGGLE_HEADER && this._data.withHeader) {
+        ItemEl.classList.add(this.CSS.settingsButtonActive);
+      }
+
       ItemEl.addEventListener('click', () => {
-        console.log('debug header');
-        this.ui.addTableHeader();
+        this.ui.handleSettingAction(item.action);
       });
 
       this.api.tooltip.onHover(ItemEl, item.title, {
