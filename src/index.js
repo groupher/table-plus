@@ -74,42 +74,7 @@ export default class Table {
 
     this.element = null;
 
-    this._data = {
-      // 斑马线?
-      // 有表头？
-      columnCount: 4,
-      items: [
-        {
-          text: 'cell 0'
-        },
-        {
-          text: 'cell 1',
-          align: 'center'
-        },
-        {
-          text: 'cell 2'
-        },
-        {
-          text: 'cell 3'
-        },
-        {
-          text: 'cell 4'
-        },
-        {
-          text: 'cell 5',
-          align: 'center'
-        },
-        {
-          text: 'cell 6'
-        },
-        {
-          text: 'cell 7'
-        },
-        {
-          text: 'cell 8'
-        }
-      ]
-    };
+    this._data = data;
 
     this.ui = new UI({
       api,

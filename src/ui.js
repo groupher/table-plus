@@ -37,6 +37,20 @@ import {
 } from './helper';
 
 /**
+ * @typedef {Object} TableData
+ * @description Table Tool's  data format
+ * @property {number} columnCount — column count
+ * @property {[CellItem]} items - array of cell item
+ */
+
+/**
+ * @typedef {Object} CellItem
+ * @description cell item
+ * @property {string} text - inner text in cell (td)
+ * @property {string} align — left | center | right
+ */
+
+/**
  * @description the ui parts
  *
  */
@@ -112,6 +126,8 @@ export default class UI {
 
   /**
    * draw render View
+   * @param {TableData} data
+   * @return {HTMLElement}
    */
   drawView(data) {
     this._data = formatData(data);
@@ -143,9 +159,9 @@ export default class UI {
   }
 
   /**
-   * TODO
-   *
-   * @param {*} data
+   * clean up and render
+   * @param {TableData} data
+   * @return {void}
    * @memberof UI
    */
   redraw(data) {
@@ -162,6 +178,9 @@ export default class UI {
 
   /**
    * draw table element
+   * @return {HTMLElement}
+   * @memberof UI
+   * @private
    */
   _drawTable() {
     const TableEl = make('table', this.CSS.table);
@@ -182,8 +201,10 @@ export default class UI {
 
   /**
    * draw a table row
-   *
+   * @param {[CellItem]} items
+   * @return {HTMLElement}
    * @memberof UI
+   * @private
    */
   _drawRow(items) {
     const RowEl = make('tr');
@@ -197,8 +218,10 @@ export default class UI {
 
   /**
    * draw cell in table row
-   *
+   * @param {CellItem} item
+   * @return {HTMLElement}
    * @memberof UI
+   * @private
    */
   _drawCell(item) {
     const TdEl = make('td');
@@ -256,9 +279,12 @@ export default class UI {
   }
 
   /**
-   * TODO:
-   *
+   * change columns action align icon
+   * @param {HTMLElement} el - column action element
+   * @param {Number} columnIndex
+   * @return {void}
    * @memberof UI
+   * @private
    */
   _changeAlignIcon(el, columnIndex) {
     const AlignEl = el.querySelector('[data-action="align"]');
@@ -285,10 +311,12 @@ export default class UI {
   }
 
   /**
+   * get svg icon by align type
    *
    * @param {String} align - left | center | right
    * @returns {String} svg format
    * @memberof UI
+   * @private
    */
   _getAlignIcon(align) {
     switch (align) {
@@ -307,7 +335,10 @@ export default class UI {
   /**
    * draw column actions
    *
+   * @param {CellItem} item
+   * @return {HTMLElement}
    * @memberof UI
+   * @private
    */
   _drawColumnActions(item) {
     const columnIndex = whichColumn(item.index, this._data);
@@ -382,7 +413,10 @@ export default class UI {
   /**
    * draw column actions
    *
+   * @param {CellItem} item
+   * @return {HTMLElement}
    * @memberof UI
+   * @private
    */
   _drawRowActions(item) {
     const rowIndex = whichRow(item.index, this._data);
@@ -451,7 +485,10 @@ export default class UI {
   /**
    * draw column handler
    *
+   * @param {CellItem} item
+   * @return {HTMLElement}
    * @memberof UI
+   * @private
    */
   _drawColumnSettingHandler(item) {
     const HandlerEl = make('div', this.CSS.columnHandler, {
@@ -470,7 +507,10 @@ export default class UI {
   /**
    * draw raw handler
    *
+   * @param {CellItem} item
+   * @return {HTMLElement}
    * @memberof UI
+   * @private
    */
   _drawRowSettingHandler(item) {
     const HandlerEl = make('div', this.CSS.rowHandler, {
