@@ -16,10 +16,10 @@
 // eslint-disable-next-line
 import { make } from "@groupher/editor-utils";
 
-import './index.css';
-import TableIcon from './svg/table.svg';
+import "./index.css";
+import TableIcon from "./svg/table.svg";
 
-import UI from './ui';
+import UI from "./ui";
 
 // eslint-disable-next-line
 import polyfill from "url-polyfill";
@@ -44,7 +44,7 @@ export default class Table {
   static get toolbox() {
     return {
       icon: TableIcon,
-      title: '表格'
+      title: "表格",
     };
   }
 
@@ -69,7 +69,7 @@ export default class Table {
      * Tool's initial config
      */
     this.config = {
-      endpoint: config.endpoint || ''
+      endpoint: config.endpoint || "",
     };
 
     this.element = null;
@@ -80,39 +80,39 @@ export default class Table {
       columnCount: 4,
       items: [
         {
-          text: 'cell 0'
+          text: "cell 0",
         },
         {
-          text: 'cell 1'
+          text: "cell 1",
         },
         {
-          text: 'cell 2'
+          text: "cell 2",
         },
         {
-          text: 'cell 3'
+          text: "cell 3",
         },
         {
-          text: 'cell 4'
+          text: "cell 4",
         },
         {
-          text: 'cell 5'
+          text: "cell 5",
         },
         {
-          text: 'cell 6'
+          text: "cell 6",
         },
         {
-          text: 'cell 7'
+          text: "cell 7",
         },
         {
-          text: 'cell 8'
-        }
-      ]
+          text: "cell 8",
+        },
+      ],
     };
 
     this.ui = new UI({
       api,
       config: this.config,
-      reRender: this.reRender.bind(this)
+      reRender: this.reRender.bind(this),
     });
   }
 
@@ -156,7 +156,7 @@ export default class Table {
    * @public
    */
   renderSettings() {
-    const Wrapper = make('div', [ this.CSS.settingsWrapper ], {});
+    const Wrapper = make("div", [this.CSS.settingsWrapper], {});
 
     // const settings = [
     //   {
@@ -187,7 +187,9 @@ export default class Table {
    * @return {TableData}
    */
   save() {
-    return this._data;
+    // this.ui.save()
+    console.log("# table: ", this.ui.data);
+    return this.ui.data;
   }
 
   /**
@@ -221,9 +223,9 @@ export default class Table {
       baseClass: this.api.styles.block,
 
       // buttons
-      settingsWrapper: 'cdx-custom-settings',
+      settingsWrapper: "cdx-custom-settings",
       settingsButton: this.api.styles.settingsButton,
-      settingsButtonActive: this.api.styles.settingsButtonActive
+      settingsButtonActive: this.api.styles.settingsButtonActive,
     };
   }
 }

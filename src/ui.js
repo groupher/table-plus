@@ -7,18 +7,18 @@ import {
   findIndex,
   clazz,
   showElement,
-  hideElements
-} from '@groupher/editor-utils';
+  hideElements,
+} from "@groupher/editor-utils";
 
-import MoveLeftIcon from './svg/move-left.svg';
-import MoveRightIcon from './svg/move-right.svg';
-import MoveUpIcon from './svg/move-up.svg';
-import MoveDownIcon from './svg/move-down.svg';
+import MoveLeftIcon from "./svg/move-left.svg";
+import MoveRightIcon from "./svg/move-right.svg";
+import MoveUpIcon from "./svg/move-up.svg";
+import MoveDownIcon from "./svg/move-down.svg";
 
-import AddIcon from './svg/add.svg';
-import DeleteIcon from './svg/delete.svg';
+import AddIcon from "./svg/add.svg";
+import DeleteIcon from "./svg/delete.svg";
 
-import AlignCenterIcon from './svg/align-center.svg';
+import AlignCenterIcon from "./svg/align-center.svg";
 
 import {
   mapIndex,
@@ -29,8 +29,8 @@ import {
   deleteRow,
   moveRow,
   whichColumn,
-  whichRow
-} from './helper';
+  whichRow,
+} from "./helper";
 
 /**
  * @description the ui parts
@@ -50,15 +50,17 @@ export default class UI {
      * Tool's initial config
      */
     this.config = {
-      endpoint: config.endpoint || ''
+      endpoint: config.endpoint || "",
     };
 
     this.nodes = {
       // root element
       wrapperEl: null,
       // container: null,
-      table: null
+      table: null,
     };
+
+    this._data = {};
 
     this.columnHandlers = [];
     this.columnActions = [];
@@ -82,23 +84,23 @@ export default class UI {
       /**
        * Tool's classes
        */
-      container: 'cdx-table-wrapper',
-      table: 'cdx-table',
-      cell: 'cdx-table__cell',
-      columnHandler: 'cdx-table__column_handler',
-      columnActions: 'cdx-table__column_actions',
-      columnActionIcon: 'cdx-table__column_action_icon',
+      container: "cdx-table-wrapper",
+      table: "cdx-table",
+      cell: "cdx-table__cell",
+      columnHandler: "cdx-table__column_handler",
+      columnActions: "cdx-table__column_actions",
+      columnActionIcon: "cdx-table__column_action_icon",
 
-      rowHandler: 'cdx-table__row_handler',
-      rowActions: 'cdx-table__row_actions',
-      rowActionIcon: 'cdx-table__row_action_icon',
+      rowHandler: "cdx-table__row_handler",
+      rowActions: "cdx-table__row_actions",
+      rowActionIcon: "cdx-table__row_action_icon",
 
-      activeColumnTd: 'cdx-table__active_column',
-      activeRowTd: 'cdx-table__active_row',
-      activeTdTop: 'cdx-table__active_top',
-      activeTdBottom: 'cdx-table__active_bottom',
-      activeTdLeft: 'cdx-table__active_left',
-      activeTdRight: 'cdx-table__active_right'
+      activeColumnTd: "cdx-table__active_column",
+      activeRowTd: "cdx-table__active_row",
+      activeTdTop: "cdx-table__active_top",
+      activeTdBottom: "cdx-table__active_bottom",
+      activeTdLeft: "cdx-table__active_left",
+      activeTdRight: "cdx-table__active_right",
     };
   }
 
@@ -106,9 +108,9 @@ export default class UI {
    * draw render View
    */
   drawView(data) {
-    this.data = mapIndex(data);
-    const wrapperEl = make('div', this.CSS.baseClass);
-    const containerEl = make('div', this.CSS.container);
+    this._data = mapIndex(data);
+    const wrapperEl = make("div", this.CSS.baseClass);
+    const containerEl = make("div", this.CSS.container);
 
     this.nodes.table = this._drawTable();
 
@@ -117,7 +119,7 @@ export default class UI {
 
     // if click outside, then clean up the active status
     // see: https://stackoverflow.com/a/28432139/4050784
-    document.addEventListener('click', (e) => {
+    document.addEventListener("click", (e) => {
       const isClickOutside = !wrapperEl.contains(e.target);
 
       if (isClickOutside) {
@@ -156,10 +158,10 @@ export default class UI {
    * draw table element
    */
   _drawTable() {
-    const TableEl = make('table', this.CSS.table);
-    const TBodyEl = make('tbody');
+    const TableEl = make("table", this.CSS.table);
+    const TBodyEl = make("tbody");
 
-    const { columnCount, items } = this.data;
+    const { columnCount, items } = this._data;
 
     for (let i = 0; i < items.length; i += columnCount) {
       const rowCellItems = items.slice(i, i + columnCount);
@@ -178,7 +180,7 @@ export default class UI {
    * @memberof UI
    */
   _drawRow(items) {
-    const RowEl = make('tr');
+    const RowEl = make("tr");
 
     items.forEach((item) => {
       RowEl.appendChild(this._drawCell(item));
@@ -193,18 +195,18 @@ export default class UI {
    * @memberof UI
    */
   _drawCell(item) {
-    const TdEl = make('td');
-    const CellEl = make('div', this.CSS.cell, {
+    const TdEl = make("td");
+    const CellEl = make("div", this.CSS.cell, {
       innerHTML: item.text,
       contentEditable: true,
-      'data-index': item.index,
-      'data-row-index': whichRow(item.index, this.data),
-      'data-column-index': whichColumn(item.index, this.data)
+      "data-index": item.index,
+      "data-row-index": whichRow(item.index, this._data),
+      "data-column-index": whichColumn(item.index, this._data),
     });
 
     TdEl.appendChild(CellEl);
 
-    if (item.index < this.data.columnCount) {
+    if (item.index < this._data.columnCount) {
       const HandlerEl = this._drawColumnSettingHandler(item);
       const ActionsEl = this._drawColumnActions(item);
 
@@ -215,7 +217,7 @@ export default class UI {
       this.columnActions.push(ActionsEl);
     }
 
-    if (item.index % this.data.columnCount === 0) {
+    if (item.index % this._data.columnCount === 0) {
       const HandlerEl = this._drawRowSettingHandler(item);
       const ActionsEl = this._drawRowActions(item);
 
@@ -226,9 +228,13 @@ export default class UI {
       this.rowActions.push(ActionsEl);
     }
 
-    CellEl.addEventListener('click', () => this._cleanUpHighlights());
+    CellEl.addEventListener("click", () => this._cleanUpHighlights());
+    CellEl.addEventListener("input", (e) => {
+      const index = e.target.dataset.index;
+      this._data.items[index].text = e.target.innerHTML;
+    });
 
-    TdEl.addEventListener('click', (e) => {
+    TdEl.addEventListener("click", (e) => {
       const index = e.target.dataset.index;
 
       this._showRowHandler(index);
@@ -244,59 +250,59 @@ export default class UI {
    * @memberof UI
    */
   _drawColumnActions(item) {
-    const columnIndex = whichColumn(item.index, this.data);
+    const columnIndex = whichColumn(item.index, this._data);
 
-    const WrapperEl = make('div', this.CSS.columnActions, {
-      'data-column-index': columnIndex
+    const WrapperEl = make("div", this.CSS.columnActions, {
+      "data-column-index": columnIndex,
     });
 
-    const MoveLeftEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: MoveLeftIcon
+    const MoveLeftEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: MoveLeftIcon,
     });
 
-    const MoveRightEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: MoveRightIcon
+    const MoveRightEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: MoveRightIcon,
     });
 
-    const AddEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: AddIcon
+    const AddEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: AddIcon,
     });
 
-    const DeleteEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: DeleteIcon
+    const DeleteEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: DeleteIcon,
     });
 
-    const AlignCenterEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: AlignCenterIcon
+    const AlignCenterEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: AlignCenterIcon,
     });
 
-    MoveLeftEl.addEventListener('click', (e) => {
-      const newData = moveColumn(this.data, columnIndex, 'left');
+    MoveLeftEl.addEventListener("click", (e) => {
+      const newData = moveColumn(this._data, columnIndex, "left");
 
       this.redraw(newData);
     });
 
-    MoveRightEl.addEventListener('click', (e) => {
-      const newData = moveColumn(this.data, columnIndex, 'right');
+    MoveRightEl.addEventListener("click", (e) => {
+      const newData = moveColumn(this._data, columnIndex, "right");
 
       this.redraw(newData);
     });
 
-    DeleteEl.addEventListener('click', (e) => {
-      const newData = deleteColumn(this.data, columnIndex);
+    DeleteEl.addEventListener("click", (e) => {
+      const newData = deleteColumn(this._data, columnIndex);
 
       this.redraw(newData);
     });
 
-    AddEl.addEventListener('click', (e) => {
-      const newData = addColumn(this.data, columnIndex);
+    AddEl.addEventListener("click", (e) => {
+      const newData = addColumn(this._data, columnIndex);
 
       this.redraw(newData);
     });
 
-    this.api.tooltip.onHover(AddEl, '增加一列', { delay: 1500 });
-    this.api.tooltip.onHover(DeleteEl, '删除当前列', { delay: 1500 });
-    this.api.tooltip.onHover(AlignCenterEl, '对齐方式', { delay: 1500 });
+    this.api.tooltip.onHover(AddEl, "增加一列", { delay: 1500 });
+    this.api.tooltip.onHover(DeleteEl, "删除当前列", { delay: 1500 });
+    this.api.tooltip.onHover(AlignCenterEl, "对齐方式", { delay: 1500 });
 
     WrapperEl.appendChild(MoveLeftEl);
     WrapperEl.appendChild(MoveRightEl);
@@ -313,59 +319,59 @@ export default class UI {
    * @memberof UI
    */
   _drawRowActions(item) {
-    const rowIndex = whichRow(item.index, this.data);
+    const rowIndex = whichRow(item.index, this._data);
 
-    const WrapperEl = make('div', this.CSS.rowActions, {
-      'data-row-index': rowIndex
+    const WrapperEl = make("div", this.CSS.rowActions, {
+      "data-row-index": rowIndex,
     });
 
-    const MoveUpEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: MoveUpIcon
+    const MoveUpEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: MoveUpIcon,
     });
 
-    const MoveDownEl = make('div', this.CSS.columnActionIcon, {
-      innerHTML: MoveDownIcon
+    const MoveDownEl = make("div", this.CSS.columnActionIcon, {
+      innerHTML: MoveDownIcon,
     });
 
-    const AddEl = make('div', this.CSS.rowActionIcon, {
-      innerHTML: AddIcon
+    const AddEl = make("div", this.CSS.rowActionIcon, {
+      innerHTML: AddIcon,
     });
 
-    const DeleteEl = make('div', this.CSS.rowActionIcon, {
-      innerHTML: DeleteIcon
+    const DeleteEl = make("div", this.CSS.rowActionIcon, {
+      innerHTML: DeleteIcon,
     });
 
-    MoveUpEl.addEventListener('click', (e) => {
-      const newData = moveRow(this.data, rowIndex, 'up');
+    MoveUpEl.addEventListener("click", (e) => {
+      const newData = moveRow(this._data, rowIndex, "up");
 
       this.redraw(newData);
     });
 
-    MoveDownEl.addEventListener('click', (e) => {
-      const newData = moveRow(this.data, rowIndex, 'down');
+    MoveDownEl.addEventListener("click", (e) => {
+      const newData = moveRow(this._data, rowIndex, "down");
 
       this.redraw(newData);
     });
 
-    AddEl.addEventListener('click', (e) => {
-      const newData = addRow(this.data, rowIndex);
+    AddEl.addEventListener("click", (e) => {
+      const newData = addRow(this._data, rowIndex);
 
       this.redraw(newData);
     });
 
-    DeleteEl.addEventListener('click', (e) => {
-      const newData = deleteRow(this.data, rowIndex);
+    DeleteEl.addEventListener("click", (e) => {
+      const newData = deleteRow(this._data, rowIndex);
 
       this.redraw(newData);
     });
 
-    this.api.tooltip.onHover(AddEl, '增加一行', {
+    this.api.tooltip.onHover(AddEl, "增加一行", {
       delay: 1500,
-      placement: 'right'
+      placement: "right",
     });
-    this.api.tooltip.onHover(DeleteEl, '删除当前行', {
+    this.api.tooltip.onHover(DeleteEl, "删除当前行", {
       delay: 1500,
-      placement: 'right'
+      placement: "right",
     });
 
     WrapperEl.appendChild(MoveUpEl);
@@ -382,11 +388,11 @@ export default class UI {
    * @memberof UI
    */
   _drawColumnSettingHandler(item) {
-    const HandlerEl = make('div', this.CSS.columnHandler, {
-      'data-column-index': whichColumn(item.index, this.data)
+    const HandlerEl = make("div", this.CSS.columnHandler, {
+      "data-column-index": whichColumn(item.index, this._data),
     });
 
-    HandlerEl.addEventListener('click', (e) => {
+    HandlerEl.addEventListener("click", (e) => {
       this._highlightColumn(item.index);
       this._hideAllHandlers();
       this._showColumnActions(item.index);
@@ -401,11 +407,11 @@ export default class UI {
    * @memberof UI
    */
   _drawRowSettingHandler(item) {
-    const HandlerEl = make('div', this.CSS.rowHandler, {
-      'data-row-index': whichRow(item.index, this.data)
+    const HandlerEl = make("div", this.CSS.rowHandler, {
+      "data-row-index": whichRow(item.index, this._data),
     });
 
-    HandlerEl.addEventListener('click', (e) => {
+    HandlerEl.addEventListener("click", (e) => {
       this._highlightRow(item.index);
       this._hideAllHandlers();
       this._showRowActions(item.index);
@@ -420,14 +426,14 @@ export default class UI {
    * @memberof UI
    */
   _showColumnActions(index) {
-    const columnIndex = whichColumn(index, this.data);
+    const columnIndex = whichColumn(index, this._data);
     const handlerEls = this.columnActions;
 
     const targetIndex = findIndex(handlerEls, (item) => {
       return parseInt(item.dataset.columnIndex) === columnIndex;
     });
 
-    showElement(targetIndex, handlerEls, 'flex');
+    showElement(targetIndex, handlerEls, "flex");
   }
 
   /**
@@ -436,14 +442,14 @@ export default class UI {
    * @memberof UI
    */
   _showRowActions(index) {
-    const rowIndex = whichRow(index, this.data);
+    const rowIndex = whichRow(index, this._data);
     const handlerEls = this.rowActions;
 
     const targetIndex = findIndex(handlerEls, (item) => {
       return parseInt(item.dataset.rowIndex) === rowIndex;
     });
 
-    showElement(targetIndex, handlerEls, 'flex');
+    showElement(targetIndex, handlerEls, "flex");
   }
 
   /**
@@ -452,7 +458,7 @@ export default class UI {
    * @memberof UI
    */
   _showColumnHandler(index) {
-    const columnIndex = whichColumn(index, this.data);
+    const columnIndex = whichColumn(index, this._data);
     const handlerEls = this.columnHandlers;
 
     const targetIndex = findIndex(handlerEls, (item) => {
@@ -470,7 +476,7 @@ export default class UI {
    * @memberof UI
    */
   _showRowHandler(index) {
-    const rowIndex = whichRow(index, this.data);
+    const rowIndex = whichRow(index, this._data);
     const handlerEls = this.rowHandlers;
 
     const targetIndex = findIndex(handlerEls, (item) => {
@@ -518,7 +524,7 @@ export default class UI {
     this.activeRowIndex = index;
     this._unHighlightCells();
 
-    const rowIndex = whichRow(index, this.data);
+    const rowIndex = whichRow(index, this._data);
 
     const rowEls = this.nodes.wrapperEl.querySelectorAll(
       `.${this.CSS.cell}[data-row-index="${rowIndex}"]`
@@ -583,5 +589,13 @@ export default class UI {
    */
   _hideAllActions() {
     hideElements([...this.columnActions, ...this.rowActions]);
+  }
+
+  /**
+   * Return Tool data
+   * @return {TableData} data
+   */
+  get data() {
+    return this._data;
   }
 }
