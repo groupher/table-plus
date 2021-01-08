@@ -17,6 +17,18 @@
     outline: none;
   }
 
+  &__cell_align_left {
+    text-align: left;
+  }
+
+  &__cell_align_center {
+    text-align: center;
+  }
+
+  &__cell_align_right {
+    text-align: right;
+  }
+
   tbody tr td {
     position: relative;
     border: 1px solid #dbdbe2;

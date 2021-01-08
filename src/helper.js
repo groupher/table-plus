@@ -1,4 +1,4 @@
-import { insertAndShift } from '@groupher/editor-utils';
+import { insertAndShift, clazz } from '@groupher/editor-utils';
 import { splitEvery, flatten, insert, remove } from 'ramda';
 
 /**
@@ -202,6 +202,50 @@ export const whichRow = (index, data) => {
   const { columnCount } = data;
 
   return Math.floor(parseInt(index) / columnCount);
+};
+
+/**
+ * setAlign to cells element and data
+ * @param {[HTMLElement]} cellsElements
+ * @param {String} align - left | center | right
+ */
+export const setAlignClass = (cellsElements, align) => {
+  const alignLeftClass = 'cdx-table__cell_align_left';
+  const alignCenterClass = 'cdx-table__cell_align_center';
+  const alignRightClass = 'cdx-table__cell_align_right';
+
+  for (let i = 0; i < cellsElements.length; i++) {
+    const element = cellsElements[i];
+
+    clazz.remove(element, alignLeftClass);
+    clazz.remove(element, alignCenterClass);
+    clazz.remove(element, alignRightClass);
+
+    clazz.add(element, `cdx-table__cell_align_${align}`);
+  }
+};
+
+/**
+ * setAlign to data.items
+ * @param {Number} columnIndex
+ * @param {String} align - left | center | right
+ * @param {TableData} data
+ */
+export const setAlignData = (columnIndex, align, data) => {
+  const columnTanks = _buildColumnTanks(data);
+
+  for (let i = 0; i < columnTanks[columnIndex].length; i++) {
+    const element = columnTanks[columnIndex][i];
+
+    element.align = align;
+  }
+
+  const regularRows = _covertToRegularRows(columnTanks, columnTanks);
+
+  return {
+    ...data,
+    items: regularRows
+  };
 };
 
 /**
