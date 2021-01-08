@@ -13,12 +13,14 @@ import { splitEvery, flatten, insert, remove } from 'ramda';
  * @description cell item
  * @property {string} text - inner text in cell (td)
  * @property {string} align — left | center | right
+ * @property {boolean} isHeader
  */
 
 /**
  * map index for data.items, fill empty cells if needed
  *
  * @param {TableData} data
+ * @return {TableData}
  */
 export const formatData = (data) => {
   const { columnCount, items } = data;
@@ -40,6 +42,33 @@ export const formatData = (data) => {
       align: !item.align || item.align === '' ? 'left' : item.align,
       index
     }))
+  };
+};
+
+/**
+ * map index for data.items, fill empty cells if needed
+ *
+ * @param {TableData} data
+ * @return {TableData}
+ */
+export const addHeader = (data) => {
+  const { columnCount, items } = data;
+
+  const rows = splitEvery(columnCount, items);
+  const holderRow = _getHolderCells(columnCount);
+  const holderRowFormatted = holderRow.map((item, index) => ({
+    ...item,
+    // keep the align with the same column
+    // 保持和同列相同的对齐方式
+    align: items[index + columnCount].align,
+    isHeader: true
+  }));
+
+  const rowsAdded = insert(0, holderRowFormatted, rows);
+
+  return {
+    ...data,
+    items: flatten(rowsAdded)
   };
 };
 

@@ -17,10 +17,12 @@
 import { make } from "@groupher/editor-utils";
 
 import './index.css';
+
 import TableIcon from './svg/table.svg';
+import TableHeaderIcon from './svg/table-header.svg';
+import TableZebraIcon from './svg/table-zebra.svg';
 
 import UI from './ui';
-
 // eslint-disable-next-line
 import polyfill from "url-polyfill";
 
@@ -123,26 +125,35 @@ export default class Table {
    * @public
    */
   renderSettings() {
-    const Wrapper = make('div', [ this.CSS.settingsWrapper ], {});
+    const Wrapper = make('div', [ this.CSS.settingsWrapper ]);
 
-    // const settings = [
-    //   {
-    //     title: "编辑链接",
-    //     icon: EditIcon,
-    //   },
-    // ];
+    const settings = [
+      {
+        title: '添加表头',
+        icon: TableHeaderIcon
+      },
+      {
+        title: '斑马条纹',
+        icon: TableZebraIcon
+      }
+    ];
 
-    // settings.forEach((item) => {
-    //   const itemEl = make("div", this.CSS.settingsButton, {
-    //     innerHTML: item.icon,
-    //   });
+    settings.forEach((item) => {
+      const ItemEl = make('div', this.CSS.settingsButton, {
+        innerHTML: item.icon
+      });
 
-    //   this.api.tooltip.onHover(itemEl, item.title, {
-    //     placement: "top",
-    //   });
+      ItemEl.addEventListener('click', () => {
+        console.log('debug header');
+        this.ui.addTableHeader();
+      });
 
-    //   Wrapper.appendChild(itemEl);
-    // });
+      this.api.tooltip.onHover(ItemEl, item.title, {
+        placement: 'top'
+      });
+
+      Wrapper.appendChild(ItemEl);
+    });
 
     return Wrapper;
   }

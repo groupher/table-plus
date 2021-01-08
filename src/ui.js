@@ -24,6 +24,7 @@ import AlignRightIcon from './svg/align-right.svg';
 
 import {
   formatData,
+  addHeader,
   addColumn,
   deleteColumn,
   moveColumn,
@@ -104,6 +105,7 @@ export default class UI {
        */
       container: 'cdx-table-wrapper',
       table: 'cdx-table',
+      header: 'cdx-table__header',
       cell: 'cdx-table__cell',
       // not for directly use
       _cellAlign: 'cdx-table__cell_align_',
@@ -114,6 +116,7 @@ export default class UI {
       rowHandler: 'cdx-table__row_handler',
       rowActions: 'cdx-table__row_actions',
       rowActionIcon: 'cdx-table__row_action_icon',
+      rowZebra: 'cdx-table__zebra_row',
 
       activeColumnTd: 'cdx-table__active_column',
       activeRowTd: 'cdx-table__active_row',
@@ -177,6 +180,19 @@ export default class UI {
   }
 
   /**
+   * add header to tabl
+   *
+   * @memberof UI
+   */
+  addTableHeader() {
+    const newData = addHeader(this._data);
+
+    console.log('newData: ', newData);
+
+    this.redraw(newData);
+  }
+
+  /**
    * draw table element
    * @return {HTMLElement}
    * @memberof UI
@@ -224,7 +240,14 @@ export default class UI {
    * @private
    */
   _drawCell(item) {
-    const TdEl = make('td');
+    // const headerClass = item.isHeader ? this.CSS.header : "";
+    // const TdEl = make('td', headerClass);
+
+    const WrapperEl = item.isHeader ? make('th', this.CSS.header) : make('td');
+
+    // item.zebraBg
+    // this.CSS.rowZebra
+
     const CellEl = make(
       'div',
       [this.CSS.cell, `${this.CSS._cellAlign}${item.align}`],
@@ -237,14 +260,14 @@ export default class UI {
       }
     );
 
-    TdEl.appendChild(CellEl);
+    WrapperEl.appendChild(CellEl);
 
     if (item.index < this._data.columnCount) {
       const HandlerEl = this._drawColumnSettingHandler(item);
       const ActionsEl = this._drawColumnActions(item);
 
-      TdEl.appendChild(HandlerEl);
-      TdEl.appendChild(ActionsEl);
+      WrapperEl.appendChild(HandlerEl);
+      WrapperEl.appendChild(ActionsEl);
 
       this.columnHandlers.push(HandlerEl);
       this.columnActions.push(ActionsEl);
@@ -254,8 +277,8 @@ export default class UI {
       const HandlerEl = this._drawRowSettingHandler(item);
       const ActionsEl = this._drawRowActions(item);
 
-      TdEl.appendChild(HandlerEl);
-      TdEl.appendChild(ActionsEl);
+      WrapperEl.appendChild(HandlerEl);
+      WrapperEl.appendChild(ActionsEl);
 
       this.rowHandlers.push(HandlerEl);
       this.rowActions.push(ActionsEl);
@@ -268,14 +291,14 @@ export default class UI {
       this._data.items[index].text = e.target.innerHTML;
     });
 
-    TdEl.addEventListener('click', (e) => {
+    WrapperEl.addEventListener('click', (e) => {
       const index = e.target.dataset.index;
 
       this._showRowHandler(index);
       this._showColumnHandler(index);
     });
 
-    return TdEl;
+    return WrapperEl;
   }
 
   /**
