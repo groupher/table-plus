@@ -460,12 +460,40 @@ export default class UI {
       const newData = moveColumn(this._data, columnIndex, "left");
 
       this.redraw(newData);
+
+      // simulate keep highlight state
+      setTimeout(() => {
+        let nextColumnIndex = whichColumn(item.index, this._data) - 1;
+        let nextItemIndex = item.index - 1;
+
+        if (nextColumnIndex < 0) {
+          nextColumnIndex = this._data.columnCount - 1;
+          nextItemIndex = nextColumnIndex;
+        }
+
+        this._showColumnActions(nextItemIndex);
+        this._highlightColumn(nextColumnIndex);
+      }, 100);
     });
 
     MoveRightEl.addEventListener("click", (e) => {
       const newData = moveColumn(this._data, columnIndex, "right");
 
       this.redraw(newData);
+
+      // simulate keep highlight state
+      setTimeout(() => {
+        let nextColumnIndex = whichColumn(item.index, this._data) + 1;
+        let nextItemIndex = item.index + 1;
+
+        if (nextColumnIndex === this._data.columnCount) {
+          nextColumnIndex = 0;
+          nextItemIndex = 0;
+        }
+
+        this._showColumnActions(nextItemIndex);
+        this._highlightColumn(nextColumnIndex);
+      }, 100);
     });
 
     DeleteEl.addEventListener("click", (e) => {
