@@ -1,6 +1,6 @@
 {
-  "name": "@groupher/editor-link",
-  "version": "2.1.4",
+  "name": "@groupher/editor-table2",
+  "version": "2.0.0",
   "keywords": [
     "codex editor",
     "tool",
@@ -8,11 +8,11 @@
     "editor.js",
     "editor"
   ],
-  "description": "Link Tool for Editor.js",
+  "description": "table Tool for Editor.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/groupher/link.git"
+    "url": "git+https://github.com/groupher/editor-table2.git"
   },
   "main": "./dist/bundle.js",
   "scripts": {
