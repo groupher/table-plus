@@ -559,11 +559,13 @@ export default class UI {
 
       // simulate keep highlight state
       setTimeout(() => {
-        let nextRowItemIndex = item.index - this._data.columnCount;
+        const { withHeader, columnCount, items } = this._data;
+        let nextRowItemIndex = item.index - columnCount;
 
-        // highlight the last line
-        if (nextRowItemIndex < 0) {
-          nextRowItemIndex = this._data.items.length - 1;
+        if (withHeader && nextRowItemIndex < columnCount - 1) {
+          nextRowItemIndex = items.length - 1;
+        } else if (nextRowItemIndex < 0) {
+          nextRowItemIndex = items.length - 1;
         }
 
         this._highlightRow(nextRowItemIndex);
@@ -578,11 +580,16 @@ export default class UI {
 
       // simulate keep highlight state
       setTimeout(() => {
-        let nextRowItemIndex = item.index + this._data.columnCount;
+        const { withHeader, columnCount, items } = this._data;
+        let nextRowItemIndex = item.index + columnCount;
         // highlight the first line
 
-        if (nextRowItemIndex === this._data.items.length) {
-          nextRowItemIndex = 0;
+        if (nextRowItemIndex === items.length) {
+          if (withHeader) {
+            nextRowItemIndex = columnCount;
+          } else {
+            nextRowItemIndex = 0;
+          }
         }
 
         this._highlightRow(nextRowItemIndex);
@@ -650,11 +657,25 @@ export default class UI {
    * @private
    */
   _drawRowSettingHandler(item) {
+    const { withHeader } = this._data;
+    const rowIndex = whichRow(item.index, this._data);
+
     const HandlerEl = make("div", this.CSS.rowHandler, {
-      "data-row-index": whichRow(item.index, this._data),
+      "data-row-index": rowIndex,
     });
 
+    if (withHeader && rowIndex === 0) {
+      // header row
+      HandlerEl.style.cursor = "not-allowed";
+    } else {
+      HandlerEl.style.cursor = "pointer";
+    }
+
     HandlerEl.addEventListener("click", (e) => {
+      if (withHeader && rowIndex === 0) {
+        return false;
+      }
+
       this._highlightRow(item.index);
       this._hideAllHandlers();
       this._showRowActions(item.index);
@@ -723,7 +744,6 @@ export default class UI {
     const handlerEls = this.rowHandlers;
 
     const targetIndex = findIndex(handlerEls, (item) => {
-      // console.log('#> each rowIndex: ', item.dataset.rowIndex);
       return parseInt(item.dataset.rowIndex) === rowIndex;
     });
 

@@ -1,5 +1,5 @@
-import { insertAndShift, clazz } from '@groupher/editor-utils';
-import { splitEvery, flatten, insert, remove } from 'ramda';
+import { insertAndShift, clazz } from "@groupher/editor-utils";
+import { splitEvery, flatten, insert, remove } from "ramda";
 
 /**
  * @typedef {Object} TableData
@@ -32,7 +32,7 @@ export const formatData = (data) => {
 
   if (missingCount > 0) {
     for (let i = 0; i < missingCount; i++) {
-      newItems.push({ text: '' });
+      newItems.push({ text: "" });
     }
   }
 
@@ -40,10 +40,10 @@ export const formatData = (data) => {
     ...data,
     items: newItems.map((item, index) => ({
       ...item,
-      align: !item.align || item.align === '' ? 'left' : item.align,
+      align: !item.align || item.align === "" ? "left" : item.align,
       isZebraStripe: !!item.isZebraStripe,
-      index
-    }))
+      index,
+    })),
   };
 };
 
@@ -63,7 +63,7 @@ export const addHeader = (data) => {
     // keep the align with the same column
     // 保持和同列相同的对齐方式
     align: items[index + columnCount].align,
-    isHeader: true
+    isHeader: true,
   }));
 
   const rowsAdded = insert(0, holderRowFormatted, rows);
@@ -71,7 +71,7 @@ export const addHeader = (data) => {
   return {
     ...data,
     withHeader: true,
-    items: flatten(rowsAdded)
+    items: flatten(rowsAdded),
   };
 };
 
@@ -90,7 +90,7 @@ export const deleteHeader = (data) => {
   return {
     ...data,
     withHeader: false,
-    items: flatten(rowsRemoved)
+    items: flatten(rowsRemoved),
   };
 };
 
@@ -116,13 +116,13 @@ export const addZebraStripe = (data) => {
     }
     rowItem.forEach((item) => (item.isZebraStripe = isZebraStripeRow));
 
-    return [ ...rowItem ];
+    return [...rowItem];
   });
 
   return {
     ...data,
     withZebraStripe: true,
-    items: flatten(rowFormatted)
+    items: flatten(rowFormatted),
   };
 };
 
@@ -139,13 +139,13 @@ export const deleteZebraStripe = (data) => {
 
   const rowFormatted = rows.map((rowItem, index) => {
     rowItem.forEach((item) => (item.isZebraStripe = false));
-    return [ ...rowItem ];
+    return [...rowItem];
   });
 
   return {
     ...data,
     withZebraStripe: false,
-    items: flatten(rowFormatted)
+    items: flatten(rowFormatted),
   };
 };
 
@@ -172,7 +172,7 @@ export const addColumn = (data, columnIndex) => {
   return {
     ...data,
     columnCount: columnCount + 1,
-    items: regularRows
+    items: regularRows,
   };
 };
 
@@ -192,7 +192,7 @@ export const deleteColumn = (data, columnIndex) => {
   return {
     ...data,
     columnCount: columnCount - 1,
-    items: regularRows
+    items: regularRows,
   };
 };
 
@@ -214,7 +214,7 @@ export const addRow = (data, rowIndex) => {
     rowHolder = rowHolder.map((item) => {
       return {
         ...item,
-        isZebraStripe: stripeIndex % 2 !== 0
+        isZebraStripe: stripeIndex % 2 !== 0,
       };
     });
   }
@@ -223,7 +223,7 @@ export const addRow = (data, rowIndex) => {
 
   return {
     ...data,
-    items: flatten(rowsAdded)
+    items: flatten(rowsAdded),
   };
 };
 
@@ -241,7 +241,7 @@ export const deleteRow = (data, rowIndex) => {
 
   return {
     ...data,
-    items: flatten(rowsRemoved)
+    items: flatten(rowsRemoved),
   };
 };
 
@@ -251,12 +251,12 @@ export const deleteRow = (data, rowIndex) => {
  * @param {string} direction - left | right
  * @return {TableData}
  */
-export const moveColumn = (data, columnIndex, direction = 'left') => {
+export const moveColumn = (data, columnIndex, direction = "left") => {
   const columnTanks = _buildColumnTanks(data);
 
   let swapColumnIndex;
 
-  if (direction === 'left') {
+  if (direction === "left") {
     swapColumnIndex =
       columnIndex - 1 < 0 ? columnTanks.length - 1 : columnIndex - 1;
   } else {
@@ -270,7 +270,7 @@ export const moveColumn = (data, columnIndex, direction = 'left') => {
 
   return {
     ...data,
-    items: regularRows
+    items: regularRows,
   };
 };
 
@@ -280,23 +280,32 @@ export const moveColumn = (data, columnIndex, direction = 'left') => {
  * @param {string} direction - up | down
  * @return {TableData}
  */
-export const moveRow = (data, rowIndex, direction = 'up') => {
-  const { columnCount, items } = data;
+export const moveRow = (data, rowIndex, direction = "up") => {
+  // TODO:  - [ ] 当有斑马线的时候，上下移动要重置斑马线条纹
+  const { columnCount, items, withHeader } = data;
   const rows = splitEvery(columnCount, items);
 
   let swapRowIndex;
 
-  if (direction === 'up') {
+  if (direction === "up") {
     swapRowIndex = rowIndex - 1 < 0 ? rows.length - 1 : rowIndex - 1;
+
+    if (withHeader && swapRowIndex === 0) {
+      swapRowIndex = rows.length - 1;
+    }
   } else {
     swapRowIndex = rowIndex + 1 > rows.length - 1 ? 0 : rowIndex + 1;
+
+    if (withHeader && swapRowIndex === 0) {
+      swapRowIndex = 1;
+    }
   }
 
   insertAndShift(rows, rowIndex, swapRowIndex);
 
   return {
     ...data,
-    items: flatten(rows)
+    items: flatten(rows),
   };
 };
 
@@ -330,9 +339,9 @@ export const whichRow = (index, data) => {
  * @param {String} align - left | center | right
  */
 export const setAlignClass = (cellsElements, align) => {
-  const alignLeftClass = 'cdx-table__cell_align_left';
-  const alignCenterClass = 'cdx-table__cell_align_center';
-  const alignRightClass = 'cdx-table__cell_align_right';
+  const alignLeftClass = "cdx-table__cell_align_left";
+  const alignCenterClass = "cdx-table__cell_align_center";
+  const alignRightClass = "cdx-table__cell_align_right";
 
   for (let i = 0; i < cellsElements.length; i++) {
     const element = cellsElements[i];
@@ -364,7 +373,7 @@ export const setAlignData = (columnIndex, align, data) => {
 
   return {
     ...data,
-    items: regularRows
+    items: regularRows,
   };
 };
 
@@ -378,7 +387,7 @@ const _getHolderCells = (count) => {
   const ret = [];
 
   for (let i = 0; i < count; i++) {
-    ret.push({ text: '' });
+    ret.push({ text: "" });
   }
 
   return ret;
