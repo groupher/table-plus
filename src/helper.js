@@ -239,10 +239,12 @@ export const deleteRow = (data, rowIndex) => {
   const rows = splitEvery(columnCount, items);
   const rowsRemoved = remove(rowIndex, 1, rows);
 
-  return {
+  const rowsData = {
     ...data,
     items: flatten(rowsRemoved),
   };
+
+  return addZebraStripe(rowsData);
 };
 
 /**
@@ -281,7 +283,6 @@ export const moveColumn = (data, columnIndex, direction = "left") => {
  * @return {TableData}
  */
 export const moveRow = (data, rowIndex, direction = "up") => {
-  // TODO:  - [ ] 当有斑马线的时候，上下移动要重置斑马线条纹
   const { columnCount, items, withHeader } = data;
   const rows = splitEvery(columnCount, items);
 
@@ -303,10 +304,13 @@ export const moveRow = (data, rowIndex, direction = "up") => {
 
   insertAndShift(rows, rowIndex, swapRowIndex);
 
-  return {
+  const rowsData = {
     ...data,
     items: flatten(rows),
   };
+
+  // reset stripe
+  return addZebraStripe(rowsData);
 };
 
 /**
