@@ -8,6 +8,7 @@
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+  /* table-layout: auto; */
   border-spacing: 0;
   box-sizing: border-box;
 
@@ -15,6 +16,7 @@
     padding: 12px 10px;
     vertical-align: top;
     outline: none;
+    /* max-width: 130px; */
   }
 
   &__cell_align_left {

@@ -204,6 +204,7 @@ export default class Table {
    * @return {TableData} data
    */
   get data() {
+    console.log('# table data: ');
     return this._data;
   }
 

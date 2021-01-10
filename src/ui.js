@@ -39,7 +39,8 @@ import {
   whichColumn,
   whichRow,
   setAlignClass,
-  setAlignData
+  setAlignData,
+  resizableTable
 } from './helper';
 
 /**
@@ -161,6 +162,8 @@ export default class UI {
         this.activeRowIndex = null;
       }
     });
+
+    setTimeout(() => resizableTable(this.nodes.table));
 
     this.nodes.wrapperEl = wrapperEl;
 
@@ -855,10 +858,35 @@ export default class UI {
   }
 
   /**
+   * set resized width if need
+   *
+   * @param {TableData} data
+   * @returns
+   * @memberof UI
+   */
+  _setCellWidthIfNeed(data) {
+    const allCellElements = this.nodes.table.querySelectorAll(
+      `.${this.CSS.cell}`
+    );
+
+    for (let i = 0; i < allCellElements.length; i++) {
+      const CellEl = allCellElements[i];
+
+      const TDResizedWidth = CellEl.parentNode.style.width;
+
+      if (TDResizedWidth) {
+        data.items[i].width = TDResizedWidth;
+      }
+    }
+
+    return data;
+  }
+
+  /**
    * Return Tool data
    * @return {TableData} data
    */
   get data() {
-    return this._data;
+    return this._setCellWidthIfNeed(this._data);
   }
 }
