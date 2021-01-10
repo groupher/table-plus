@@ -874,6 +874,8 @@ export default class UI {
 
       const TDResizedWidth = CellEl.parentNode.style.width;
 
+      //  NOTE:  only set first row if resized data is fine
+      // no need to set all column with the some column index
       if (TDResizedWidth) {
         data.items[i].width = TDResizedWidth;
       }
