@@ -127,7 +127,7 @@ export default class Table {
    * @public
    */
   renderSettings() {
-    const Wrapper = make('div', [ this.CSS.settingsWrapper ]);
+    const Wrapper = make('div');
 
     const settings = [
       {
@@ -213,8 +213,7 @@ export default class Table {
     return {
       baseClass: this.api.styles.block,
 
-      // buttons
-      settingsWrapper: 'cdx-custom-settings',
+      // settings class
       settingsButton: this.api.styles.settingsButton,
       settingsButtonActive: this.api.styles.settingsButtonActive
     };
