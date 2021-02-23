@@ -204,7 +204,7 @@ export default class UI {
     }
 
     if (action === SETTING.TOGGLE_ZEBRA) {
-      this._data.withZebraStripe
+      this._data.withStripe
         ? this._deleteZebraStripe()
         : this._addZebraStripe();
     }
@@ -305,7 +305,7 @@ export default class UI {
     // const headerClass = item.isHeader ? this.CSS.header : "";
     // const TdEl = make('td', headerClass);
 
-    const stripClass = item.isZebraStripe ? this.CSS.stripe : '';
+    const stripClass = item.isStripe ? this.CSS.stripe : '';
 
     const WrapperEl = item.isHeader
       ? make('th', this.CSS.header)
@@ -870,7 +870,6 @@ export default class UI {
 
     for (let i = 0; i < allCellElements.length; i++) {
       const CellEl = allCellElements[i];
-
       const TDResizedWidth = CellEl.parentNode.style.width;
 
       //  NOTE:  only set first row if resized data is fine

@@ -154,7 +154,7 @@ export default class Table {
       }
 
       if (item.action === SETTING.TOGGLE_ZEBRA) {
-        this._data.withZebraStripe
+        this._data.withStripe
           ? ItemEl.classList.add(this.CSS.settingsButtonActive)
           : ItemEl.classList.remove(this.CSS.settingsButtonActive);
       }

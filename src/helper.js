@@ -14,7 +14,7 @@ import { splitEvery, flatten, insert, remove } from 'ramda';
  * @property {string} text - inner text in cell (td)
  * @property {string} align — left | center | right
  * @property {boolean} isHeader
- * @property {boolean} isZebraStripe
+ * @property {boolean} isStripe
  */
 
 /**
@@ -41,7 +41,7 @@ export const formatData = (data) => {
     items: newItems.map((item, index) => ({
       ...item,
       align: !item.align || item.align === '' ? 'left' : item.align,
-      isZebraStripe: !!item.isZebraStripe,
+      isStripe: !!item.isStripe,
       index
     }))
   };
@@ -108,20 +108,20 @@ export const addZebraStripe = (data) => {
   const rowFormatted = rows.map((rowItem, index) => {
     const stripeIndex = withHeader ? index + 1 : index;
 
-    let isZebraStripeRow = stripeIndex % 2 !== 0;
+    let isStripeRow = stripeIndex % 2 !== 0;
 
     // if has table header, do not stripe it
     if (withHeader && index === 0) {
-      isZebraStripeRow = false;
+      isStripeRow = false;
     }
-    rowItem.forEach((item) => (item.isZebraStripe = isZebraStripeRow));
+    rowItem.forEach((item) => (item.isStripe = isStripeRow));
 
     return [ ...rowItem ];
   });
 
   return {
     ...data,
-    withZebraStripe: true,
+    withStripe: true,
     items: flatten(rowFormatted)
   };
 };
@@ -138,13 +138,13 @@ export const deleteZebraStripe = (data) => {
   const rows = splitEvery(columnCount, items);
 
   const rowFormatted = rows.map((rowItem, index) => {
-    rowItem.forEach((item) => (item.isZebraStripe = false));
+    rowItem.forEach((item) => (item.isStripe = false));
     return [ ...rowItem ];
   });
 
   return {
     ...data,
-    withZebraStripe: false,
+    withStripe: false,
     items: flatten(rowFormatted)
   };
 };
@@ -203,18 +203,18 @@ export const deleteColumn = (data, columnIndex) => {
  * @return {TableData}
  */
 export const addRow = (data, rowIndex) => {
-  const { columnCount, withZebraStripe, withHeader, items } = data;
+  const { columnCount, withStripe, withHeader, items } = data;
 
   const rows = splitEvery(columnCount, items);
   let rowHolder = _getHolderCells(columnCount);
 
-  if (withZebraStripe && rowIndex + 1 > 1) {
+  if (withStripe && rowIndex + 1 > 1) {
     const stripeIndex = withHeader ? rowIndex : rowIndex + 1;
 
     rowHolder = rowHolder.map((item) => {
       return {
         ...item,
-        isZebraStripe: stripeIndex % 2 !== 0
+        isStripe: stripeIndex % 2 !== 0
       };
     });
   }
