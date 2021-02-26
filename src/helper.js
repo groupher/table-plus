@@ -339,22 +339,22 @@ export const whichRow = (index, data) => {
 
 /**
  * setAlign to cells element and data
- * @param {[HTMLElement]} cellsElements
+ * @param {[HTMLElement]} cellsEls
  * @param {String} align - left | center | right
  */
-export const setAlignClass = (cellsElements, align) => {
+export const setAlignClass = (cellsEls, align) => {
   const alignLeftClass = 'cdx-table__cell_align_left';
   const alignCenterClass = 'cdx-table__cell_align_center';
   const alignRightClass = 'cdx-table__cell_align_right';
 
-  for (let i = 0; i < cellsElements.length; i++) {
-    const element = cellsElements[i];
+  for (let i = 0; i < cellsEls.length; i++) {
+    const el = cellsEls[i];
 
-    clazz.remove(element, alignLeftClass);
-    clazz.remove(element, alignCenterClass);
-    clazz.remove(element, alignRightClass);
+    clazz.remove(el, alignLeftClass);
+    clazz.remove(el, alignCenterClass);
+    clazz.remove(el, alignRightClass);
 
-    clazz.add(element, `cdx-table__cell_align_${align}`);
+    clazz.add(el, `cdx-table__cell_align_${align}`);
   }
 };
 
@@ -368,9 +368,9 @@ export const setAlignData = (columnIndex, align, data) => {
   const columnTanks = _buildColumnTanks(data);
 
   for (let i = 0; i < columnTanks[columnIndex].length; i++) {
-    const element = columnTanks[columnIndex][i];
+    const el = columnTanks[columnIndex][i];
 
-    element.align = align;
+    el.align = align;
   }
 
   const regularRows = _covertToRegularRows(columnTanks, columnTanks);

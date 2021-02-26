@@ -261,20 +261,20 @@ export default class UI {
    * @private
    */
   _drawTable() {
-    const TableEl = make('table', this.CSS.table);
-    const TBodyEl = make('tbody');
+    const tableEl = make('table', this.CSS.table);
+    const tbodyEl = make('tbody');
 
     const { columnCount, items } = this._data;
 
     for (let i = 0; i < items.length; i += columnCount) {
       const rowCellItems = items.slice(i, i + columnCount);
 
-      TBodyEl.appendChild(this._drawRow(rowCellItems));
+      tbodyEl.appendChild(this._drawRow(rowCellItems));
     }
 
-    TableEl.appendChild(TBodyEl);
+    tableEl.appendChild(tbodyEl);
 
-    return TableEl;
+    return tableEl;
   }
 
   /**
@@ -285,13 +285,13 @@ export default class UI {
    * @private
    */
   _drawRow(items) {
-    const RowEl = make('tr');
+    const rowEl = make('tr');
 
     items.forEach((item) => {
-      RowEl.appendChild(this._drawCell(item));
+      rowEl.appendChild(this._drawCell(item));
     });
 
-    return RowEl;
+    return rowEl;
   }
 
   /**
@@ -307,11 +307,11 @@ export default class UI {
 
     const stripClass = item.isStripe ? this.CSS.stripe : '';
 
-    const WrapperEl = item.isHeader
+    const wrapperEl = item.isHeader
       ? make('th', this.CSS.header)
       : make('td', stripClass);
 
-    const CellEl = make(
+    const cellEl = make(
       'div',
       [this.CSS.cell, `${this.CSS._cellAlign}${item.align}`],
       {
@@ -323,45 +323,45 @@ export default class UI {
       }
     );
 
-    WrapperEl.appendChild(CellEl);
+    wrapperEl.appendChild(cellEl);
 
     if (item.index < this._data.columnCount) {
-      const HandlerEl = this._drawColumnSettingHandler(item);
+      const handlerEl = this._drawColumnSettingHandler(item);
       const ActionsEl = this._drawColumnActions(item);
 
-      WrapperEl.appendChild(HandlerEl);
-      WrapperEl.appendChild(ActionsEl);
+      wrapperEl.appendChild(handlerEl);
+      wrapperEl.appendChild(ActionsEl);
 
-      this.columnHandlers.push(HandlerEl);
+      this.columnHandlers.push(handlerEl);
       this.columnActions.push(ActionsEl);
     }
 
     if (item.index % this._data.columnCount === 0) {
-      const HandlerEl = this._drawRowSettingHandler(item);
+      const handlerEl = this._drawRowSettingHandler(item);
       const ActionsEl = this._drawRowActions(item);
 
-      WrapperEl.appendChild(HandlerEl);
-      WrapperEl.appendChild(ActionsEl);
+      wrapperEl.appendChild(handlerEl);
+      wrapperEl.appendChild(ActionsEl);
 
-      this.rowHandlers.push(HandlerEl);
+      this.rowHandlers.push(handlerEl);
       this.rowActions.push(ActionsEl);
     }
 
-    CellEl.addEventListener('click', () => this._cleanUpHighlights());
-    CellEl.addEventListener('input', (e) => {
+    cellEl.addEventListener('click', () => this._cleanUpHighlights());
+    cellEl.addEventListener('input', (e) => {
       const index = e.target.dataset.index;
 
       this._data.items[index].text = e.target.innerHTML;
     });
 
-    WrapperEl.addEventListener('click', (e) => {
+    wrapperEl.addEventListener('click', (e) => {
       const index = e.target.dataset.index;
 
       this._showRowHandler(index);
       this._showColumnHandler(index);
     });
 
-    return WrapperEl;
+    return wrapperEl;
   }
 
   /**
@@ -373,26 +373,26 @@ export default class UI {
    * @private
    */
   _changeAlignIcon(el, columnIndex) {
-    const AlignEl = el.querySelector('[data-action="align"]');
+    const alignEl = el.querySelector('[data-action="align"]');
     const cellEls = this.nodes.wrapperEl.querySelectorAll(
       `.${this.CSS.cell}[data-column-index="${columnIndex}"]`
     );
 
     let nextAlign;
 
-    if (AlignEl.dataset.align === 'left') {
+    if (alignEl.dataset.align === 'left') {
       nextAlign = 'center';
-    } else if (AlignEl.dataset.align === 'center') {
+    } else if (alignEl.dataset.align === 'center') {
       nextAlign = 'right';
-    } else if (AlignEl.dataset.align === 'right') {
+    } else if (alignEl.dataset.align === 'right') {
       nextAlign = 'left';
     }
 
     setTimeout(() => {
       setAlignClass(cellEls, nextAlign);
       this._data = setAlignData(columnIndex, nextAlign, this._data);
-      AlignEl.setAttribute('data-align', nextAlign);
-      AlignEl.innerHTML = this._getAlignIcon(nextAlign);
+      alignEl.setAttribute('data-align', nextAlign);
+      alignEl.innerHTML = this._getAlignIcon(nextAlign);
     });
   }
 
@@ -429,37 +429,37 @@ export default class UI {
   _drawColumnActions(item) {
     const columnIndex = whichColumn(item.index, this._data);
 
-    const WrapperEl = make('div', this.CSS.columnActions, {
+    const wrapperEl = make('div', this.CSS.columnActions, {
       'data-column-index': columnIndex
     });
 
-    const MoveLeftEl = make('div', this.CSS.columnActionIcon, {
+    const moveLeftEl = make('div', this.CSS.columnActionIcon, {
       innerHTML: MoveLeftIcon
     });
 
-    const MoveRightEl = make('div', this.CSS.columnActionIcon, {
+    const moveRightEl = make('div', this.CSS.columnActionIcon, {
       innerHTML: MoveRightIcon
     });
 
-    const AddEl = make('div', this.CSS.columnActionIcon, {
+    const addEl = make('div', this.CSS.columnActionIcon, {
       innerHTML: AddIcon
     });
 
-    const DeleteEl = make('div', this.CSS.columnActionIcon, {
+    const deleteEl = make('div', this.CSS.columnActionIcon, {
       innerHTML: DeleteIcon
     });
 
-    const AlignEl = make('div', this.CSS.columnActionIcon, {
+    const alignEl = make('div', this.CSS.columnActionIcon, {
       innerHTML: this._getAlignIcon(item.align),
       'data-action': 'align',
       'data-align': item.align
     });
 
-    AlignEl.addEventListener('click', (e) => {
-      this._changeAlignIcon(WrapperEl, columnIndex);
+    alignEl.addEventListener('click', (e) => {
+      this._changeAlignIcon(wrapperEl, columnIndex);
     });
 
-    MoveLeftEl.addEventListener('click', (e) => {
+    moveLeftEl.addEventListener('click', (e) => {
       const newData = moveColumn(this._data, columnIndex, 'left');
 
       this.redraw(newData);
@@ -479,7 +479,7 @@ export default class UI {
       }, 100);
     });
 
-    MoveRightEl.addEventListener('click', (e) => {
+    moveRightEl.addEventListener('click', (e) => {
       const newData = moveColumn(this._data, columnIndex, 'right');
 
       this.redraw(newData);
@@ -499,29 +499,29 @@ export default class UI {
       }, 100);
     });
 
-    DeleteEl.addEventListener('click', (e) => {
+    deleteEl.addEventListener('click', (e) => {
       const newData = deleteColumn(this._data, columnIndex);
 
       this.redraw(newData);
     });
 
-    AddEl.addEventListener('click', (e) => {
+    addEl.addEventListener('click', (e) => {
       const newData = addColumn(this._data, columnIndex);
 
       this.redraw(newData);
     });
 
-    this.api.tooltip.onHover(AddEl, '增加一列', { delay: 1500 });
-    this.api.tooltip.onHover(DeleteEl, '删除当前列', { delay: 1500 });
-    this.api.tooltip.onHover(AlignEl, '对齐方式', { delay: 200 });
+    this.api.tooltip.onHover(addEl, '增加一列', { delay: 1500 });
+    this.api.tooltip.onHover(deleteEl, '删除当前列', { delay: 1500 });
+    this.api.tooltip.onHover(alignEl, '对齐方式', { delay: 200 });
 
-    WrapperEl.appendChild(MoveLeftEl);
-    WrapperEl.appendChild(MoveRightEl);
-    WrapperEl.appendChild(AlignEl);
-    WrapperEl.appendChild(AddEl);
-    WrapperEl.appendChild(DeleteEl);
+    wrapperEl.appendChild(moveLeftEl);
+    wrapperEl.appendChild(moveRightEl);
+    wrapperEl.appendChild(alignEl);
+    wrapperEl.appendChild(addEl);
+    wrapperEl.appendChild(deleteEl);
 
-    return WrapperEl;
+    return wrapperEl;
   }
 
   /**
@@ -535,27 +535,27 @@ export default class UI {
   _drawRowActions(item) {
     const rowIndex = whichRow(item.index, this._data);
 
-    const WrapperEl = make('div', this.CSS.rowActions, {
+    const wrapperEl = make('div', this.CSS.rowActions, {
       'data-row-index': rowIndex
     });
 
-    const MoveUpEl = make('div', this.CSS.columnActionIcon, {
+    const moveUpEl = make('div', this.CSS.columnActionIcon, {
       innerHTML: MoveUpIcon
     });
 
-    const MoveDownEl = make('div', this.CSS.columnActionIcon, {
+    const moveDownEl = make('div', this.CSS.columnActionIcon, {
       innerHTML: MoveDownIcon
     });
 
-    const AddEl = make('div', this.CSS.rowActionIcon, {
+    const addEl = make('div', this.CSS.rowActionIcon, {
       innerHTML: AddIcon
     });
 
-    const DeleteEl = make('div', this.CSS.rowActionIcon, {
+    const deleteEl = make('div', this.CSS.rowActionIcon, {
       innerHTML: DeleteIcon
     });
 
-    MoveUpEl.addEventListener('click', (e) => {
+    moveUpEl.addEventListener('click', (e) => {
       const newData = moveRow(this._data, rowIndex, 'up');
 
       this.redraw(newData);
@@ -576,7 +576,7 @@ export default class UI {
       }, 100);
     });
 
-    MoveDownEl.addEventListener('click', (e) => {
+    moveDownEl.addEventListener('click', (e) => {
       const newData = moveRow(this._data, rowIndex, 'down');
 
       this.redraw(newData);
@@ -600,33 +600,33 @@ export default class UI {
       }, 100);
     });
 
-    AddEl.addEventListener('click', (e) => {
+    addEl.addEventListener('click', (e) => {
       const newData = addRow(this._data, rowIndex);
 
       this.redraw(newData);
     });
 
-    DeleteEl.addEventListener('click', (e) => {
+    deleteEl.addEventListener('click', (e) => {
       const newData = deleteRow(this._data, rowIndex);
 
       this.redraw(newData);
     });
 
-    this.api.tooltip.onHover(AddEl, '增加一行', {
+    this.api.tooltip.onHover(addEl, '增加一行', {
       delay: 1500,
       placement: 'right'
     });
-    this.api.tooltip.onHover(DeleteEl, '删除当前行', {
+    this.api.tooltip.onHover(deleteEl, '删除当前行', {
       delay: 1500,
       placement: 'right'
     });
 
-    WrapperEl.appendChild(MoveUpEl);
-    WrapperEl.appendChild(MoveDownEl);
-    WrapperEl.appendChild(AddEl);
-    WrapperEl.appendChild(DeleteEl);
+    wrapperEl.appendChild(moveUpEl);
+    wrapperEl.appendChild(moveDownEl);
+    wrapperEl.appendChild(addEl);
+    wrapperEl.appendChild(deleteEl);
 
-    return WrapperEl;
+    return wrapperEl;
   }
 
   /**
@@ -638,17 +638,17 @@ export default class UI {
    * @private
    */
   _drawColumnSettingHandler(item) {
-    const HandlerEl = make('div', this.CSS.columnHandler, {
+    const handlerEl = make('div', this.CSS.columnHandler, {
       'data-column-index': whichColumn(item.index, this._data)
     });
 
-    HandlerEl.addEventListener('click', (e) => {
+    handlerEl.addEventListener('click', (e) => {
       this._highlightColumn(item.index);
       this._hideAllHandlers();
       this._showColumnActions(item.index);
     });
 
-    return HandlerEl;
+    return handlerEl;
   }
 
   /**
@@ -663,18 +663,18 @@ export default class UI {
     const { withHeader } = this._data;
     const rowIndex = whichRow(item.index, this._data);
 
-    const HandlerEl = make('div', this.CSS.rowHandler, {
+    const handlerEl = make('div', this.CSS.rowHandler, {
       'data-row-index': rowIndex
     });
 
     if (withHeader && rowIndex === 0) {
       // header row
-      HandlerEl.style.cursor = 'not-allowed';
+      handlerEl.style.cursor = 'not-allowed';
     } else {
-      HandlerEl.style.cursor = 'pointer';
+      handlerEl.style.cursor = 'pointer';
     }
 
-    HandlerEl.addEventListener('click', (e) => {
+    handlerEl.addEventListener('click', (e) => {
       if (withHeader && rowIndex === 0) {
         return false;
       }
@@ -684,7 +684,7 @@ export default class UI {
       this._showRowActions(item.index);
     });
 
-    return HandlerEl;
+    return handlerEl;
   }
 
   /**
@@ -864,13 +864,13 @@ export default class UI {
    * @memberof UI
    */
   _setCellWidthIfNeed(data) {
-    const allCellElements = this.nodes.table.querySelectorAll(
+    const allCellEls = this.nodes.table.querySelectorAll(
       `.${this.CSS.cell}`
     );
 
-    for (let i = 0; i < allCellElements.length; i++) {
-      const CellEl = allCellElements[i];
-      const TDResizedWidth = CellEl.parentNode.style.width;
+    for (let i = 0; i < allCellEls.length; i++) {
+      const cellEl = allCellEls[i];
+      const TDResizedWidth = cellEl.parentNode.style.width;
 
       //  NOTE:  only set first row if resized data is fine
       // no need to set all column with the some column index
