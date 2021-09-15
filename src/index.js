@@ -16,15 +16,15 @@
 // eslint-disable-next-line
 import { make } from "@groupher/editor-utils";
 
-import './index.css';
+import "./index.css";
 
-import { SETTING } from './constant';
+import { SETTING } from "./constant";
 
-import TableIcon from './svg/table.svg';
-import TableHeaderIcon from './svg/table-header.svg';
-import TableZebraIcon from './svg/table-zebra.svg';
+import TableIcon from "./svg/table.svg";
+import TableHeaderIcon from "./svg/table-header.svg";
+import TableZebraIcon from "./svg/table-zebra.svg";
 
-import UI from './ui';
+import UI from "./ui";
 // eslint-disable-next-line
 import polyfill from "url-polyfill";
 
@@ -48,7 +48,7 @@ export default class Table {
   static get toolbox() {
     return {
       icon: TableIcon,
-      title: '表格'
+      title: "表格",
     };
   }
 
@@ -73,17 +73,22 @@ export default class Table {
      * Tool's initial config
      */
     this.config = {
-      endpoint: config.endpoint || ''
+      endpoint: config.endpoint || "",
     };
 
     this.element = null;
 
-    this._data = data;
+    const defaultData = {
+      items: [{ text: "" }, { text: "" }, { text: "" }, { text: "" }],
+      columnCount: 2,
+    };
+    // this._data = data || { items: [], columnCount: 2 };
+    this._data = defaultData;
 
     this.ui = new UI({
       api,
       config: this.config,
-      reRender: this.reRender.bind(this)
+      reRender: this.reRender.bind(this),
     });
   }
 
@@ -127,24 +132,24 @@ export default class Table {
    * @public
    */
   renderSettings() {
-    const Wrapper = make('div');
+    const Wrapper = make("div");
 
     const settings = [
       {
-        title: '添加表头',
+        title: "添加表头",
         action: SETTING.TOGGLE_HEADER,
-        icon: TableHeaderIcon
+        icon: TableHeaderIcon,
       },
       {
-        title: '斑马条纹',
+        title: "斑马条纹",
         action: SETTING.TOGGLE_ZEBRA,
-        icon: TableZebraIcon
-      }
+        icon: TableZebraIcon,
+      },
     ];
 
     settings.forEach((item) => {
-      const ItemEl = make('div', this.CSS.settingsButton, {
-        innerHTML: item.icon
+      const ItemEl = make("div", this.CSS.settingsButton, {
+        innerHTML: item.icon,
       });
 
       if (item.action === SETTING.TOGGLE_HEADER) {
@@ -159,12 +164,12 @@ export default class Table {
           : ItemEl.classList.remove(this.CSS.settingsButtonActive);
       }
 
-      ItemEl.addEventListener('click', () => {
+      ItemEl.addEventListener("click", () => {
         this.ui.handleSettingAction(item.action);
       });
 
       this.api.tooltip.onHover(ItemEl, item.title, {
-        placement: 'top'
+        placement: "top",
       });
 
       Wrapper.appendChild(ItemEl);
@@ -215,7 +220,7 @@ export default class Table {
 
       // settings class
       settingsButton: this.api.styles.settingsButton,
-      settingsButtonActive: this.api.styles.settingsButtonActive
+      settingsButtonActive: this.api.styles.settingsButtonActive,
     };
   }
 }

@@ -1,5 +1,5 @@
-import { insertAndShift, clazz } from '@groupher/editor-utils';
-import { splitEvery, flatten, insert, remove } from 'ramda';
+import { insertAndShift, clazz } from "@groupher/editor-utils";
+import { splitEvery, flatten, insert, remove } from "ramda";
 
 /**
  * @typedef {Object} TableData
@@ -32,7 +32,7 @@ export const formatData = (data) => {
 
   if (missingCount > 0) {
     for (let i = 0; i < missingCount; i++) {
-      newItems.push({ text: '' });
+      newItems.push({ text: "" });
     }
   }
 
@@ -40,10 +40,10 @@ export const formatData = (data) => {
     ...data,
     items: newItems.map((item, index) => ({
       ...item,
-      align: !item.align || item.align === '' ? 'left' : item.align,
+      align: !item.align || item.align === "" ? "left" : item.align,
       isStripe: !!item.isStripe,
-      index
-    }))
+      index,
+    })),
   };
 };
 
@@ -63,7 +63,7 @@ export const addHeader = (data) => {
     // keep the align with the same column
     // 保持和同列相同的对齐方式
     align: items[index + columnCount].align,
-    isHeader: true
+    isHeader: true,
   }));
 
   const rowsAdded = insert(0, holderRowFormatted, rows);
@@ -71,7 +71,7 @@ export const addHeader = (data) => {
   return {
     ...data,
     withHeader: true,
-    items: flatten(rowsAdded)
+    items: flatten(rowsAdded),
   };
 };
 
@@ -90,7 +90,7 @@ export const deleteHeader = (data) => {
   return {
     ...data,
     withHeader: false,
-    items: flatten(rowsRemoved)
+    items: flatten(rowsRemoved),
   };
 };
 
@@ -116,13 +116,13 @@ export const addZebraStripe = (data) => {
     }
     rowItem.forEach((item) => (item.isStripe = isStripeRow));
 
-    return [ ...rowItem ];
+    return [...rowItem];
   });
 
   return {
     ...data,
     withStripe: true,
-    items: flatten(rowFormatted)
+    items: flatten(rowFormatted),
   };
 };
 
@@ -139,13 +139,13 @@ export const deleteZebraStripe = (data) => {
 
   const rowFormatted = rows.map((rowItem, index) => {
     rowItem.forEach((item) => (item.isStripe = false));
-    return [ ...rowItem ];
+    return [...rowItem];
   });
 
   return {
     ...data,
     withStripe: false,
-    items: flatten(rowFormatted)
+    items: flatten(rowFormatted),
   };
 };
 
@@ -172,7 +172,7 @@ export const addColumn = (data, columnIndex) => {
   return {
     ...data,
     columnCount: columnCount + 1,
-    items: regularRows
+    items: regularRows,
   };
 };
 
@@ -192,7 +192,7 @@ export const deleteColumn = (data, columnIndex) => {
   return {
     ...data,
     columnCount: columnCount - 1,
-    items: regularRows
+    items: regularRows,
   };
 };
 
@@ -214,7 +214,7 @@ export const addRow = (data, rowIndex) => {
     rowHolder = rowHolder.map((item) => {
       return {
         ...item,
-        isStripe: stripeIndex % 2 !== 0
+        isStripe: stripeIndex % 2 !== 0,
       };
     });
   }
@@ -223,7 +223,7 @@ export const addRow = (data, rowIndex) => {
 
   return {
     ...data,
-    items: flatten(rowsAdded)
+    items: flatten(rowsAdded),
   };
 };
 
@@ -241,7 +241,7 @@ export const deleteRow = (data, rowIndex) => {
 
   const rowsData = {
     ...data,
-    items: flatten(rowsRemoved)
+    items: flatten(rowsRemoved),
   };
 
   return addZebraStripe(rowsData);
@@ -253,12 +253,12 @@ export const deleteRow = (data, rowIndex) => {
  * @param {string} direction - left | right
  * @return {TableData}
  */
-export const moveColumn = (data, columnIndex, direction = 'left') => {
+export const moveColumn = (data, columnIndex, direction = "left") => {
   const columnTanks = _buildColumnTanks(data);
 
   let swapColumnIndex;
 
-  if (direction === 'left') {
+  if (direction === "left") {
     swapColumnIndex =
       columnIndex - 1 < 0 ? columnTanks.length - 1 : columnIndex - 1;
   } else {
@@ -272,7 +272,7 @@ export const moveColumn = (data, columnIndex, direction = 'left') => {
 
   return {
     ...data,
-    items: regularRows
+    items: regularRows,
   };
 };
 
@@ -282,13 +282,13 @@ export const moveColumn = (data, columnIndex, direction = 'left') => {
  * @param {string} direction - up | down
  * @return {TableData}
  */
-export const moveRow = (data, rowIndex, direction = 'up') => {
+export const moveRow = (data, rowIndex, direction = "up") => {
   const { columnCount, items, withHeader } = data;
   const rows = splitEvery(columnCount, items);
 
   let swapRowIndex;
 
-  if (direction === 'up') {
+  if (direction === "up") {
     swapRowIndex = rowIndex - 1 < 0 ? rows.length - 1 : rowIndex - 1;
 
     if (withHeader && swapRowIndex === 0) {
@@ -306,7 +306,7 @@ export const moveRow = (data, rowIndex, direction = 'up') => {
 
   const rowsData = {
     ...data,
-    items: flatten(rows)
+    items: flatten(rows),
   };
 
   // reset stripe
@@ -343,9 +343,9 @@ export const whichRow = (index, data) => {
  * @param {String} align - left | center | right
  */
 export const setAlignClass = (cellsEls, align) => {
-  const alignLeftClass = 'cdx-table__cell_align_left';
-  const alignCenterClass = 'cdx-table__cell_align_center';
-  const alignRightClass = 'cdx-table__cell_align_right';
+  const alignLeftClass = "cdx-table__cell_align_left";
+  const alignCenterClass = "cdx-table__cell_align_center";
+  const alignRightClass = "cdx-table__cell_align_right";
 
   for (let i = 0; i < cellsEls.length; i++) {
     const el = cellsEls[i];
@@ -377,7 +377,7 @@ export const setAlignData = (columnIndex, align, data) => {
 
   return {
     ...data,
-    items: regularRows
+    items: regularRows,
   };
 };
 
@@ -391,7 +391,7 @@ const _getHolderCells = (count) => {
   const ret = [];
 
   for (let i = 0; i < count; i++) {
-    ret.push({ text: '' });
+    ret.push({ text: "" });
   }
 
   return ret;
@@ -459,15 +459,15 @@ export const resizableTable = (table) => {
    * @returns
    */
   const createDragDiv = (height) => {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
 
     div.style.top = 0;
     div.style.right = 0;
-    div.style.width = '8px';
-    div.style.position = 'absolute';
-    div.style.cursor = 'col-resize';
-    div.style.userSelect = 'none';
-    div.style.height = height + 'px';
+    div.style.width = "8px";
+    div.style.position = "absolute";
+    div.style.cursor = "col-resize";
+    div.style.userSelect = "none";
+    div.style.height = height + "px";
     return div;
   };
 
@@ -478,12 +478,12 @@ export const resizableTable = (table) => {
    * @returns
    */
   const paddingDiff = (col) => {
-    if (getStyleVal(col, 'box-sizing') == 'border-box') {
+    if (getStyleVal(col, "box-sizing") == "border-box") {
       return 0;
     }
 
-    var padLeft = getStyleVal(col, 'padding-left');
-    var padRight = getStyleVal(col, 'padding-right');
+    var padLeft = getStyleVal(col, "padding-left");
+    var padRight = getStyleVal(col, "padding-right");
 
     return parseInt(padLeft) + parseInt(padRight);
   };
@@ -498,7 +498,7 @@ export const resizableTable = (table) => {
 
     div.style.zIndex = 1;
 
-    div.addEventListener('mousedown', function (e) {
+    div.addEventListener("mousedown", function (e) {
       curCol = e.target.parentElement;
       nxtCol = curCol.nextElementSibling;
       pageX = e.pageX;
@@ -509,31 +509,31 @@ export const resizableTable = (table) => {
       if (nxtCol) nxtColWidth = nxtCol.offsetWidth - padding;
     });
 
-    div.addEventListener('mouseover', function (e) {
+    div.addEventListener("mouseover", function (e) {
       // if the cell has multi lines, the height should be re-calc
       const tableHeight = table.offsetHeight - 2;
 
-      div.style.height = tableHeight + 'px';
+      div.style.height = tableHeight + "px";
 
-      e.target.style.borderRight = '2px solid';
-      e.target.style.borderRightColor = '#DBDBE2';
+      e.target.style.borderRight = "2px solid";
+      e.target.style.borderRightColor = "#DBDBE2";
     });
 
-    div.addEventListener('mouseout', function (e) {
-      e.target.style.borderRight = '';
+    div.addEventListener("mouseout", function (e) {
+      e.target.style.borderRight = "";
     });
 
-    document.addEventListener('mousemove', function (e) {
+    document.addEventListener("mousemove", function (e) {
       if (curCol) {
         const diffX = e.pageX - pageX;
 
-        if (nxtCol) nxtCol.style.width = nxtColWidth - diffX + 'px';
+        if (nxtCol) nxtCol.style.width = nxtColWidth - diffX + "px";
 
-        curCol.style.width = curColWidth + diffX + 'px';
+        curCol.style.width = curColWidth + diffX + "px";
       }
     });
 
-    document.addEventListener('mouseup', function (e) {
+    document.addEventListener("mouseup", function (e) {
       curCol = undefined;
       nxtCol = undefined;
       pageX = undefined;
@@ -553,7 +553,7 @@ export const resizableTable = (table) => {
     return window.getComputedStyle(elm, null).getPropertyValue(css);
   };
 
-  const row = table.getElementsByTagName('tr')[0];
+  const row = table.getElementsByTagName("tr")[0];
   const cols = row ? row.children : undefined;
 
   if (!cols) return;
@@ -566,7 +566,7 @@ export const resizableTable = (table) => {
     const div = createDragDiv(tableHeight);
 
     cols[i].appendChild(div);
-    cols[i].style.position = 'relative';
+    cols[i].style.position = "relative";
     setListeners(div);
   }
 };

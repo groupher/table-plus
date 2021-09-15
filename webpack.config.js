@@ -1,12 +1,17 @@
-const path = require("path");
-
 module.exports = {
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ["babel-loader", "eslint-loader?fix=true"],
+        use: [
+          {
+            loader: "babel-loader",
+            query: {
+              presets: ["@babel/preset-env"],
+            },
+          },
+        ],
       },
       {
         test: /\.css$/,
@@ -31,7 +36,7 @@ module.exports = {
     ],
   },
   output: {
-    path: path.join(__dirname, "/dist"),
+    path: __dirname + "/dist",
     publicPath: "/",
     filename: "bundle.js",
     library: "Table",

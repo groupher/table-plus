@@ -1,7 +1,3 @@
-// eslint-disable-next-line
-import ajax from "@codexteam/ajax";
-// eslint-disable-next-line
-import polyfill from "url-polyfill";
 import {
   make,
   findIndex,
@@ -329,6 +325,7 @@ export default class UI {
         "data-index": item.index,
         "data-row-index": whichRow(item.index, this._data),
         "data-column-index": whichColumn(item.index, this._data),
+        "data-skip-plus-button": true,
       }
     );
 
