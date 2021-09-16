@@ -119,7 +119,7 @@
 
   &__column_actions {
     position: absolute;
-    top: -24px;
+    top: -26px;
     left: 10%;
     width: 80%;
     height: 20px;
@@ -131,6 +131,8 @@
   &__column_action_icon {
     margin-right: 8px;
     cursor: pointer;
+    width: 12px;
+    height: 12px;
 
     svg {
       fill: #0599cc;
@@ -147,9 +149,9 @@
   &__row_actions {
     position: absolute;
     top: 5px;
-    left: -45px;
-    width: 32px;
+    left: -40px;
     flex-wrap: wrap;
+    width: 32px;
     height: 32px;
     justify-content: space-between;
     flex-direction: column;
@@ -159,6 +161,8 @@
 
   &__row_action_icon {
     cursor: pointer;
+    width: 12px;
+    height: 12px;
 
     svg {
       fill: #0599cc;
