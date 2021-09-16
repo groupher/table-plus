@@ -42,7 +42,7 @@
     font-size: 16px;
     padding-top: 18px;
     font-weight: bold;
-    border-bottom: 2px solid #dbdbe2 !important;
+    border-bottom: 2px solid #dbdbe2;
   }
 
   &__td_stripe {
@@ -55,30 +55,30 @@
 
   &__active_column {
     background: #e6f8ff;
-    border-left: 2px solid #0fb3f3 !important;
-    border-right: 2px solid #0fb3f3 !important;
+    border-left: 2px solid #0fb3f3;
+    border-right: 2px solid #0fb3f3;
   }
 
   &__active_row {
     background: #e6f8ff;
-    border-top: 2px solid #0fb3f3 !important;
-    border-bottom: 2px solid #0fb3f3 !important;
+    border-top: 2px solid #0fb3f3;
+    border-bottom: 2px solid #0fb3f3;
   }
 
   &__active_top {
-    border-top: 2px solid #0fb3f3 !important;
+    border-top: 2px solid #0fb3f3;
   }
 
   &__active_bottom {
-    border-bottom: 2px solid #0fb3f3 !important;
+    border-bottom: 2px solid #0fb3f3;
   }
 
   &__active_left {
-    border-left: 2px solid #0fb3f3 !important;
+    border-left: 2px solid #0fb3f3;
   }
 
   &__active_right {
-    border-right: 2px solid #0fb3f3 !important;
+    border-right: 2px solid #0fb3f3;
   }
 
   &__column_handler {
