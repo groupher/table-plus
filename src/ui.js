@@ -517,8 +517,8 @@ export default class UI {
       this.redraw(newData);
     });
 
-    this.api.tooltip.onHover(addEl, "增加一列", { delay: 1500 });
-    this.api.tooltip.onHover(deleteEl, "删除当前列", { delay: 1500 });
+    this.api.tooltip.onHover(addEl, "增加一列", { delay: 200 });
+    this.api.tooltip.onHover(deleteEl, "删除当前列", { delay: 200 });
     this.api.tooltip.onHover(alignEl, "对齐方式", { delay: 200 });
 
     wrapperEl.appendChild(moveLeftEl);
@@ -619,11 +619,11 @@ export default class UI {
     });
 
     this.api.tooltip.onHover(addEl, "增加一行", {
-      delay: 1500,
+      delay: 200,
       placement: "right",
     });
     this.api.tooltip.onHover(deleteEl, "删除当前行", {
-      delay: 1500,
+      delay: 200,
       placement: "right",
     });
 
