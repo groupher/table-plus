@@ -158,6 +158,11 @@ export default class UI {
 
   /**
    * clear active handler/highlights state when click outside
+   * 注意这里有 hack, 如果只用 document 来判断，在 paragraph 被 focus
+   * 的时候不会触发（原因未知）。所以在 save 时又做了一次校验来判断，但是付过
+   * 只用 save 时判断，在 list 中有不会被触发（原因未知），所以这个逻辑结合
+   * 两种方法一起判断，尚不清楚这是 editor.js 自身的问题还是相关插件的问题，
+   * 总之这块儿是相当的狗。
    *
    * @param {HTMLElementEvent} e
    * @memberof UI
@@ -166,12 +171,16 @@ export default class UI {
     const isClickOutside = !this.nodes.wrapperEl.contains(e.target);
 
     if (isClickOutside) {
-      this._hideAllHandlers();
-      this._cleanUpHighlights();
-
-      this.activeColumnIndex = null;
-      this.activeRowIndex = null;
+      this._doOutsideCleanUpStaff();
     }
+  }
+
+  _doOutsideCleanUpStaff() {
+    this._hideAllHandlers();
+    this._cleanUpHighlights();
+
+    this.activeColumnIndex = null;
+    this.activeRowIndex = null;
   }
 
   /**
@@ -891,6 +900,16 @@ export default class UI {
    * @return {TableData} data
    */
   get data() {
+    const activeClassList = document.activeElement.classList;
+
+    if (
+      // 某些 handler 是绝对定位, 此时 activeElement 为 body
+      activeClassList.length !== 0 &&
+      !activeClassList.contains(this.CSS.cell)
+    ) {
+      this._doOutsideCleanUpStaff();
+    }
+
     return this._setCellWidthIfNeed(this._data);
   }
 }

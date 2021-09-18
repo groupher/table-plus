@@ -14,7 +14,11 @@
  */
 
 // eslint-disable-next-line
-import { make, enableCtrlEnterBreak } from "@groupher/editor-utils";
+import {
+  make,
+  enableCtrlEnterBreak,
+  addBreakHint,
+} from "@groupher/editor-utils";
 
 import "./index.css";
 
@@ -101,6 +105,7 @@ export default class Table {
   render() {
     this.element = this.ui.drawView(this._data);
     enableCtrlEnterBreak(this.element, this.api);
+    addBreakHint(this.element);
 
     return this.element;
   }
@@ -114,6 +119,7 @@ export default class Table {
   reRender(data) {
     this._data = data;
     this.replaceElement(this.ui.drawView(this._data));
+    addBreakHint(this.element);
   }
 
   /**

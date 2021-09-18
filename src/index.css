@@ -176,3 +176,27 @@
     transition: all 0.3s;
   }
 }
+
+.cdx-block:focus-within .cdx-ctrlbreak-hint {
+  opacity: 1;
+}
+
+.cdx-ctrlbreak-hint {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+
+  display: flex;
+  font-size: 10px;
+  color: grey;
+  height: 15px;
+
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.cdx-ctrlbreak-entity {
+  height: 12px;
+  margin-top: 2px;
+  margin-left: 4px;
+}

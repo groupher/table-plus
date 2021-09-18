@@ -660,10 +660,10 @@
   "resolved" "https://registry.npmjs.org/@codexteam/ajax/-/ajax-3.2.1.tgz"
   "version" "3.2.1"
 
-"@groupher/editor-utils@^0.2.52":
-  "integrity" "sha512-A/Y0iPLi7bJZn7PvfDCIMfnV/AjalBmeUlH+32jYOrur+Khpe9Ij32KCylQXD4Nk9aEp0XCZ1pfKqGNqgDHEvQ=="
-  "resolved" "https://registry.npmjs.org/@groupher/editor-utils/-/editor-utils-0.2.52.tgz"
-  "version" "0.2.52"
+"@groupher/editor-utils@^0.2.54":
+  "integrity" "sha512-vBn38Berc/bLgxObeH9tJXxBG+r5vO0+H1ii3MG2yZ1akYylb+SiT+MI4T+yadGbIpKsyKBHGq7wLiWHHFvMhQ=="
+  "resolved" "https://registry.npmjs.org/@groupher/editor-utils/-/editor-utils-0.2.54.tgz"
+  "version" "0.2.54"
   dependencies:
     "debug" "^4.1.1"
     "pubsub-js" "^1.8.0"
@@ -2400,6 +2400,7 @@
   "version" "1.0.5"
 
 "eslint-config-codex@github:codex-team/eslint-config":
+  "integrity" "sha512-cgJZxNqPMRCfJZnNpJ6dXror+qjve0Tl+fQEVz9d1U2mqmmim+G+8FcJb9CE0EKDhoXoXD4yd7SXjUXLvT+zrg=="
   "resolved" "git+ssh://git@github.com/codex-team/eslint-config.git#ed71c6b1c5248a62c10b3185bea6f6bcdaac3f88"
   "version" "1.1.1"
   dependencies:
